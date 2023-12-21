@@ -1,0 +1,55 @@
+.container{
+    width: 1000px;
+    margin-bottom: 100px;
+}
+*{
+    font-family: 'Noto Sans KR', sans-serif;
+}
+a, a:visited, a:link{
+    text-decoration: none;
+    color: white;
+}
+header{
+    height: 155px;
+    width: 100%;
+    background: rgb(24,49,83);
+
+}
+.header{
+    width: 1000px;
+    height: 100%;
+    margin: 0 auto;
+}
+.header_top > ul, li{
+    float: left;
+    color: white;
+    list-style-type: none;
+    font-size: 9pt;
+}
+.header_top > ul{
+    margin : 10px;
+}
+.header_top, .header_bottom{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header_bottom{
+    width: 700px;
+    margin: 0 auto;
+    height: 92px;
+}
+.logo{
+    color: white;
+}
+.real_bottom{
+    height: fit-content;
+    margin-left: 100px;
+}
+.search-form{
+    width: fit-content;
+    display: flex;
+}
+.searchword{
+    width: 250px;
+}

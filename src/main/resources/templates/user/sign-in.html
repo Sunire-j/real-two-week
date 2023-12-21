@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .step {
+            width: 100%;
+            border-bottom: 2px solid #000;
+            justify-content: space-between;
+            margin-top: 100px;
+        }
+        .button-container {
+            width: 200px;
+            margin: 0 auto;
+            justify-content: space-between;
+        }
+        .login-form, .find-container{
+            margin: 0 auto;
+            width: fit-content;
+        }
+        .login-form{
+            margin-top: 50px;
+        }
+        .find-container{
+            margin-top: 30px;
+        }
+        .social-container>img{
+            width: 200px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+        .social-container{
+            width: 200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+    <!--    회원가입 상단 고정요소-->
+    <div class="step d-flex">
+        <h3 style="font-weight: bold">로그인</h3>
+    </div>
+    <!--        회원가입 상단 고정요소 끝-->
+
+    <form action="/LoginOk" method="post" class="login-form">
+        <div>
+            <label for="userid" class="form-label"> 아이디
+                <input type="text" class="form-control" id="userid" name="userid">
+            </label>
+        </div>
+        <div><label for="userpwd" class="form-label">비밀번호<input type="password" class="form-control" id="userpwd"
+                                                                name="userpwd"></label></div>
+
+
+
+        <div class="button-container d-flex">
+            <input type="submit" id="login" value="로그인" class="btn btn-primary">
+            <input type="button" value="회원가입" class="btn btn-secondary" onclick="location.href='/signup'">
+        </div>
+    </form>
+    <div class="find-container d-flex">
+        <a style="color: black" href="/find/id">아이디</a>&nbsp;/&nbsp;<a style="color: black" href="/find/pw">비밀번호 찾기</a>
+    </div>
+    <div class="social-container">
+        <img onclick="location.href='/oauth2/authorization/google'" src="/img/google_login.png">
+        <img onclick="location.href='/oauth2/authorization/naver'" src="/img/naver_login.png">
+    </div>
+</div>
+<script>
+    $(function(){
+
+
+    })
+</script>
+
+</body>
+</html>
