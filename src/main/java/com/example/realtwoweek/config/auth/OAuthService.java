@@ -3,6 +3,7 @@ package com.example.realtwoweek.config.auth;
 import com.example.realtwoweek.domain.Member;
 import com.example.realtwoweek.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -12,9 +13,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /*
     OAuth2 로그인 성공시 DB에 저장하는 작업
@@ -44,8 +43,16 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 
         Map<String, Object> customAttribute = customAttribute(attributes, userNameAttributeName, memberProfile, registrationId);
 
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        if (member.isAdmin()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        System.out.println(authorities.toString());
+
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("USER")),
+                authorities,
                 customAttribute,
                 userNameAttributeName);
 

@@ -20,6 +20,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .authorizeRequests()
+                .antMatchers("/css/**", "/img/**", "/upload/**").permitAll()
+                .and()
                 .headers().frameOptions().disable()
                 .and()
                 .logout().logoutSuccessUrl("/") // logout 요청시 홈으로 이동 - 기본 logout url = "/logout"
@@ -33,7 +36,7 @@ public class SecurityConfig {
                 .authorizeRequests() // URL 별 접근 권한 설정
                 .antMatchers("/", "/signin").permitAll() // 모든 권한에서 접근 가능
                 .antMatchers("/loginInfo").hasAnyRole("USER", "ADMIN") // USER 권한에서 접근 가능
-                .antMatchers("/admin").hasRole("ADMIN") // 관리자 권한에서 접근 가능
+                .antMatchers("/admin/**").hasRole("ADMIN") // 관리자 권한에서 접근 가능
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

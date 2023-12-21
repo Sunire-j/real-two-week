@@ -30,13 +30,17 @@ public class Member {
     @Column(name = "nickname", nullable = true, unique = true)
     private String nickname;
 
+    @Column(name = "isadmin", nullable = false)
+    private boolean isadmin = false;
+
     @Builder //생성을 Builder 패턴으로 하기 위해서
-    public Member(Long id, String name, String email, String provider, String nickname) {
+    public Member(Long id, String name, String email, String provider, String nickname, boolean isAdmin) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.provider = provider;
         this.nickname = nickname;
+        this.isadmin = isAdmin;
     }
 
 
@@ -44,5 +48,9 @@ public class Member {
         this.name = name;
         this.email = email;
         return this;
+    }
+
+    public boolean isAdmin() {
+        return this.isadmin;
     }
 }

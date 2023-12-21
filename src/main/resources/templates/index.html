@@ -1,13 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>구글 로그인</title>
+    <style>
+        .item-list{
+            width: 1000px;
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .items-img{
+            text-align: center;
+            align-items: center;
+            width: 235px;
+            height: 232px;
+            margin-bottom: 3px;
+            border: 1px solid #ddd;
+            display: flex;
+        }
+        .items-img > img{
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        .each-items{
+            text-align: center;
+        }
+        .price-tag{
+            color: white;
+            background: #aaa;
+            padding: 2px;
+        }
+        .price-tag, .price{
+            font-size: 12px;
+        }
+        .each-items{
+            margin-right: 20px;
+        }
+        .each-items:nth-of-type(4n){
+            margin-right: 0;
+        }
+        .each-items>div{
+            cursor: pointer;
+        }
+        .title-div{
+            margin-bottom: 30px;
+            margin-top: 100px;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
-<a href="/oauth2/authorization/google" class="btn btn-sm btn-success active" role="button">Google Login</a><br>
-<a href="/oauth2/authorization/naver" class="btn btn-sm btn-success active" role="button">Naver Login</a><br>
-<a href="/oauth2/authorization/kakao" class="btn btn-third active" role="button">Kakao Login</a>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+    <!--    카로셀 슬라이더-->
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="/img/banner.jpg" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="/img/banner.jpg" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+                <img src="/img/banner.jpg" class="d-block w-100" alt="...">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <!--    신상품-->
 
+    <div class="title-div d-flex">
+        <h3 class="title">신상품</h3>
+        <a class="plus-button" href="#" style="color: black"><i class="fa-solid fa-plus"></i></a>
+    </div>
+
+    <div class="item-list">
+        <div style="font-weight: bold; text-align: center; width: 100%" th:if="${newitems.size()==0}">신상품이 없습니다.</div>
+        <!--        each-items를 foreach로 뽑아주면 됨-->
+        <div class="each-items"  th:each="items : ${newitems}">
+            <div class="items-img" th:onclick="|location.href='/goods/view?no=${items.items_id}'|">
+                <!--                여기에 db에 저장한 이미지주소 들어감-->
+                <img th:src="${items.img}">
+            </div>
+            <div class="items-name" th:text="${items.name}">바지&벨트</div>
+            <span class="price-tag">판매가</span>
+            <span class="price" data-th-text="${#numbers.formatInteger(items.price,3,'COMMA')+'원'}"></span>
+        </div>
+    </div>
+
+    <!--    추천상품-->
+    <!-- 추천의 기준?.... 잘 팔리는거?... 일단 최신순-->
+    <div class="title-div d-flex">
+        <h3 class="title">추천상품</h3>
+        <a class="plus-button" href="#" style="color: black"><i class="fa-solid fa-plus"></i></a>
+    </div>
+    <div class="item-list">
+        <div style="font-weight: bold; text-align: center; width: 100%" th:if="${newitems.size()==0}">추천상품이 없습니다.</div>
+        <!--        each-items를 foreach로 뽑아주면 됨-->
+        <div class="each-items"  th:each="items : ${newitems}">
+            <div class="items-img"  th:onclick="|location.href='/goods/view?no=${items.items_id}'|">
+                <!--                여기에 db에 저장한 이미지주소 들어감-->
+                <img th:src="${items.img}">
+            </div>
+            <div class="items-name" th:text="${items.name}">바지&벨트</div>
+            <span class="price-tag">판매가</span>
+            <span class="price" data-th-text="${#numbers.formatInteger(items.price,3,'COMMA')+'원'}"></span>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+<div th:replace="fragments/footer::footer"></div>
 </body>
 </html>

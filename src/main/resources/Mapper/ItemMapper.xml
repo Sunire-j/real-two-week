@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.realtwoweek.Mapper.ItemMapper">
+
+    <select id="getNewItems" resultType="com.example.realtwoweek.vo.ItemVO">
+        select *
+        from items
+        order by date desc
+            limit 8;
+    </select>
+
+    <select id="getRecommendItems" resultType="com.example.realtwoweek.vo.ItemVO">
+        select *
+        from items
+        order by date desc
+            limit 8;
+    </select>
+
+    <select id="getItemDetail" resultType="com.example.realtwoweek.vo.ItemVO">
+        select *
+        from items
+        where items_id = #{param1};
+    </select>
+
+    <select id="getGoodsList" resultType="com.example.realtwoweek.vo.ItemVO">
+        select * from items where category=#{param1};
+    </select>
+</mapper>
