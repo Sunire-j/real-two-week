@@ -1,9 +1,6 @@
 package com.example.realtwoweek.domain;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -27,6 +24,7 @@ public class Member {
     @Column(name = "provider", nullable = false)
     private String provider;
 
+    @Setter
     @Column(name = "nickname", nullable = true, unique = true)
     private String nickname;
 

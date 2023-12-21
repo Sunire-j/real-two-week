@@ -30,30 +30,7 @@ public class HomeController{
     }
 
     @GetMapping("/")
-    public String home (Model model, OAuth2AuthenticationToken authentication){
-        if (authentication != null) {
-            String name = "";
-            Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
-            String provider = authentication.getAuthorizedClientRegistrationId();
-
-            System.out.println("Email: " + authentication.getName());  // Print email
-            System.out.println("Provider: " + provider);  // Print provider
-
-            if ("google".equals(provider)) {
-                name = (String) attributes.get("name");
-            } else if ("naver".equals(provider)) {
-                Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-                name = (String) response.get("name");
-            }
-
-            Optional<Member> optionalMember = memberRepository.findByEmailAndProvider(authentication.getName(), provider);
-            if(optionalMember.isPresent()){
-                System.out.println("들어옴?");
-                Member member = optionalMember.get();
-                model.addAttribute("member", member.getName());
-                System.out.println(member.getName());
-            }
-        }
+    public String home (Model model){
         //신상품 리스트 가져오기
         List<ItemVO> Newlist = itemMapper.getNewItems();
         List<ItemVO> RecommendList = itemMapper.getRecommendItems();
