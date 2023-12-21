@@ -51,7 +51,6 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
         } else {
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         }
-        System.out.println(authorities.toString());
 
         return new DefaultOAuth2User(
                 authorities,

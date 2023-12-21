@@ -16,7 +16,6 @@
     <script>
         $(document).ready(function() {
             $.get("/api/nickname", function(data) {
-                console.log(data);
                 $("#nickname").text(data);
             });
         });

@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .logout().logoutSuccessUrl("/") // logout 요청시 홈으로 이동 - 기본 logout url = "/logout"
                 .and()
                 .oauth2Login() // OAuth2 로그인 설정 시작점
-                .defaultSuccessUrl("/oauth/loginInfo", true) // OAuth2 성공시 redirect
+                .defaultSuccessUrl("/", true) // OAuth2 성공시 redirect
                 .userInfoEndpoint() // OAuth2 로그인 성공 이후 사용자 정보를 가져올 때 설정 담당
                 .userService(oAuthService) // OAuth2 로그인 성공 시, 작업을 진행할 MemberService
                 .and()

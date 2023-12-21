@@ -23,38 +23,12 @@ public class HeaderController {
 
     @Autowired
     private MemberRepository memberRepository;
-//    @GetMapping("/nickname")
-//    public ResponseEntity<?> getNickname(OAuth2AuthenticationToken authentication) {
-//        if (authentication != null) {
-//            String name = "";
-//            Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
-//            String provider = authentication.getAuthorizedClientRegistrationId();
-//
-//            if ("google".equals(provider)) {
-//                name = (String) attributes.get("name");
-//            } else if ("naver".equals(provider)) {
-//                Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-//                name = (String) response.get("name");
-//            }
-//
-//            Optional<Member> optionalMember = memberRepository.findByEmailAndProvider(authentication.getName(), provider);
-//            if(optionalMember.isPresent()){
-//                Member member = optionalMember.get();
-//                member.setNickname(name);  // Set the nickname to the retrieved name
-//                System.out.println();
-//                return ResponseEntity.ok().body(member.getNickname());
-//            }
-//        }
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//    }
 
     @GetMapping("/nickname")
     public String getNickname() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         OAuth2User principal = (OAuth2User) authentication.getPrincipal();
-        String name = (String) principal.getAttributes().get("name");
-        System.out.println(name);
-        return name;
+        return (String) principal.getAttributes().get("name");
 
     }
 }
