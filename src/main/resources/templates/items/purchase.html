@@ -87,8 +87,10 @@
 
             $("#samesame").on('change',function(){
                 if($(this).is(':checked')){
-                    //여기에서 주문자명 연락처 긴빠이쳐와야함
-                    //셀렉트도 있으니 총 4개임
+                    $("#receivename").val($("#order-name").val());
+                    $('#tel1').val($('select[name="tel1"]').val()).change();
+                    $('#tel2').val($('input[name="tel2"]').val());
+                    $('#tel3').val($('input[name="tel3"]').val());
                 }else{
                     console.log('깡통');
                 }
@@ -109,6 +111,7 @@
                 });
 
                 $('#emaildomain').prop('readonly', true);
+
         })
     </script>
 </head>
@@ -161,8 +164,7 @@
                 <div>이메일</div>
             </div>
             <div class="right">
-                <div><input type="text" style="width: 100px" class="form-control form-control-sm" name="order-username"
-                            value="고길동"></div>
+                <div><input th:value="${username}" type="text" style="width: 200px" id="order-name" class="form-control form-control-sm" name="order-username"></div>
                 <div class="d-flex">
                     <select class="form-select form-select-sm" name="tel1" style="width: 100px">
                         <option value="none">선택</option>
@@ -174,11 +176,9 @@
                         <option value="019">019</option>
                     </select>
                     &nbsp;-&nbsp;
-                    <input class="form-control form-control-sm" style="width: 100px" type="text" name="tel2"
-                           value="1234">
+                    <input class="form-control form-control-sm" style="width: 100px" type="text" name="tel2">
                     &nbsp;-&nbsp;
-                    <input class="form-control form-control-sm" type="text" name="tel3" style="width: 100px"
-                           value="5678">
+                    <input class="form-control form-control-sm" type="text" name="tel3" style="width: 100px">
                 </div>
                 <div class="d-flex">
                     <input type="text" style="width: 200px" name="email1" th:value="${emailid}"
@@ -215,7 +215,7 @@
                 <div>배송 시 요청사항</div>
             </div>
             <div class="right">
-                <div><input type="text" style="width: 100px" class="form-control form-control-sm" id="receivename">
+                <div><input type="text" style="width: 200px" class="form-control form-control-sm" id="receivename">
                 </div>
                 <div class="d-flex">
                     <select class="form-select form-select-sm" id="tel1" style="width: 100px">
@@ -228,11 +228,9 @@
                         <option value="019">019</option>
                     </select>
                     &nbsp;-&nbsp;
-                    <input class="form-control form-control-sm" style="width: 100px" type="text" id="tel2"
-                           value="1234">
+                    <input class="form-control form-control-sm" style="width: 100px" type="text" id="tel2">
                     &nbsp;-&nbsp;
-                    <input class="form-control form-control-sm" type="text" name="tel3" style="width: 100px"
-                           value="5678">
+                    <input class="form-control form-control-sm" type="text" id="tel3" style="width: 100px">
                 </div>
                 <div>배송지 주소</div>
                 <div>배송 시 요청사항</div>

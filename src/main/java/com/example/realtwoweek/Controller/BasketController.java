@@ -179,6 +179,8 @@ public class BasketController {
         model.addAttribute("emailid", emailid);
         String emaildomain = u_email.substring(u_email.indexOf('@')+1);
         model.addAttribute("emaildomain",emaildomain);
+        String username = memberMapper.getUsername(userid);
+        model.addAttribute("username", username);
         return "/items/purchase";
     }
 }
