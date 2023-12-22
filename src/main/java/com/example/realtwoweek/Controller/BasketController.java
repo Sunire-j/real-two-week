@@ -138,4 +138,40 @@ public class BasketController {
         int result = basketMapper.dropItem(userid, itemid);
         return result;
     }
+
+    @GetMapping("/basket/purchase")
+    public String purchase(OAuth2AuthenticationToken authentication, Model model){
+        Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
+        String provider = authentication.getAuthorizedClientRegistrationId();
+        String u_email;
+        if ("naver".equals(provider)) {
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+            u_email = (String) response.get("email");
+        } else {
+            u_email = (String) attributes.getOrDefault("email", "default_email");
+        }
+
+        Long userid = memberMapper.getUserid(provider, u_email);
+
+        List<BasketVO> bList = basketMapper.getAllBasket(userid);
+
+        int maxDelivery = bList.stream()
+                .mapToInt(BasketVO::getDelivery)
+                .max()
+                .orElse(0);
+
+        int total = (bList.stream()
+                .mapToInt(basket -> basket.getPrice() * basket.getAmount())
+                .sum());
+
+        System.out.println(maxDelivery);
+        System.out.println(total);
+
+        model.addAttribute("maxDelivery", maxDelivery);
+        model.addAttribute("sumPrice",total);
+
+        model.addAttribute("blist",bList);
+
+        return "/items/purchase";
+    }
 }

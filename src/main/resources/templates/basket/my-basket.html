@@ -90,13 +90,13 @@
 <div th:replace="fragments/header::header"></div>
 <div class="container">
     <div class="basket-top">
-        <h2>장바구니</h2>
+        <h2 style="font-weight: bold">장바구니</h2>
         <hr/>
         <img src="https://malldemo01.swm.whoismall.com/skin/f_simple/images/shop/order_step01_topimg.gif">
     </div>
     <!--    이 아래쪽에 상품 정보 띄워주고 수량변경, 삭제, 총 결제금액등이 나와줘야함-->
     <div class="item-list">
-        <h5>주문 리스트</h5>
+        <h5 style="font-weight: bold">주문 리스트</h5>
         <table class="table table-hover">
             <thead>
             <tr>
@@ -118,7 +118,7 @@
                 <td>
                     <input th:value="${list.amount}" type="number" name="amount" class="form-control form-control-sm"
                            min="1">
-                    <input id="apply" type="button" value="적용" class="btn btn-sm btn-primary">
+                    <input style="margin-top: 5px" id="apply" type="button" value="적용" class="btn btn-sm btn-primary">
                 </td>
                 <td th:text="${#numbers.formatInteger(list.price,3,'COMMA')+'원'}">상품금액</td>
                 <td th:text="${#numbers.formatInteger(list.price * list.amount,3,'COMMA')+'원'}">합계</td>
