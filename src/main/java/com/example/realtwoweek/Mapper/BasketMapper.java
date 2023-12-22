@@ -14,4 +14,5 @@ public interface BasketMapper {
     List<BasketVO> getAllBasket(Long userid);
 
     int SetAmount(Long userid, int id, int num);
+    int dropItem(Long userid, int id);
 }

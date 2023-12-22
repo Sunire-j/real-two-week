@@ -39,4 +39,9 @@
         set amount=#{param3}
         where member_id=#{param1} and items_id=#{param2};
     </update>
+
+    <delete id="dropItem">
+        delete from basket
+        where member_id=#{param1} and items_id=#{param2};
+    </delete>
 </mapper>
