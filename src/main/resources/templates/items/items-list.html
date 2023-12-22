@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .item-amount{
+            width: 1000px;
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .items-img{
+            text-align: center;
+            align-items: center;
+            width: 235px;
+            height: 232px;
+            margin-bottom: 3px;
+            border: 1px solid #ddd;
+            display: flex;
+        }
+        .items-img > img{
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        .each-items{
+            text-align: center;
+        }
+        .price-tag{
+            color: white;
+            background: #aaa;
+            padding: 2px;
+        }
+        .price-tag, .price{
+            font-size: 12px;
+        }
+        .each-items{
+            margin-right: 20px;
+        }
+        .each-items:nth-of-type(4n){
+            margin-right: 0;
+        }
+        .each-items>div{
+            cursor: pointer;
+        }
+        .title-div{
+            margin-bottom: 30px;
+            margin-top: 100px;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+    <script>
+        function startScript(){
+
+        }
+    </script>
+</head>
+<body>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+
+<!--    신상품-->
+
+    <div class="title-div d-flex">
+        <h3 class="title" th:text="${category}">누구용</h3>
+    </div>
+
+
+    <div class="item-list">
+        <div style="font-weight: bold; text-align: center; width: 100%" th:if="${ilist.size()==0}">상품이 없습니다.</div>
+<!--        each-items를 foreach로 뽑아주면 됨-->
+        <div class="each-items"  th:each="items : ${ilist}">
+            <div class="items-img" th:onclick="|location.href='/goods/view?no=${items.items_id}'|">
+                <!--                여기에 db에 저장한 이미지주소 들어감-->
+                <img th:src="|/${items.img}|">
+            </div>
+            <div class="items-name" th:text="${items.name}">바지&벨트</div>
+            <span class="price-tag">판매가</span>
+            <span class="price" data-th-text="${#numbers.formatInteger(items.price,3,'COMMA')+'원'}"></span>
+           </div>
+    </div>
+
+</div>
+
+</body>
+</html>

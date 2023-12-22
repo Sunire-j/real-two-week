@@ -20,9 +20,6 @@ import java.util.Optional;
 @Controller
 public class HomeController{
 
-    @Autowired
-    private MemberRepository memberRepository;
-
     private final ItemMapper itemMapper;
 
     public HomeController(ItemMapper itemMapper) {

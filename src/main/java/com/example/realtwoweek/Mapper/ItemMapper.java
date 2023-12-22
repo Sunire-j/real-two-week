@@ -15,4 +15,5 @@ public interface ItemMapper {
     int getNeedOptionCount(int no);
 
     List<ItemVO> getGoodsList(int category);
+
 }

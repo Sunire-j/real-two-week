@@ -21,9 +21,6 @@ import java.util.Optional;
 
 public class HeaderController {
 
-    @Autowired
-    private MemberRepository memberRepository;
-
     @GetMapping("/nickname")
     public String getNickname() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

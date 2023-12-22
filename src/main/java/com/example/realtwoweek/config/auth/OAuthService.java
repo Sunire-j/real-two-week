@@ -29,17 +29,17 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
         OAuth2UserService delegate = new DefaultOAuth2UserService();
         String accessToken = userRequest.getAccessToken().getTokenValue();
         System.out.println(accessToken);
-        OAuth2User oAuth2User = delegate.loadUser(userRequest); // OAuth 서비스(kakao, google, naver)에서 가져온 유저 정보를 담고있음
+        OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration()
-                .getRegistrationId(); // OAuth 서비스 이름(ex. kakao, naver, google)
+                .getRegistrationId();
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
-                .getUserNameAttributeName(); // OAuth 로그인 시 키(pk)가 되는 값
-        Map<String, Object> attributes = oAuth2User.getAttributes(); // OAuth 서비스의 유저 정보들
+                .getUserNameAttributeName();
+        Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        MemberProfile memberProfile = OAuthAttributes.extract(registrationId, attributes); // registrationId에 따라 유저 정보를 통해 공통된 UserProfile 객체로 만들어 줌
+        MemberProfile memberProfile = OAuthAttributes.extract(registrationId, attributes);
         memberProfile.setProvider(registrationId);
         Member member = saveOrUpdate(memberProfile);
 

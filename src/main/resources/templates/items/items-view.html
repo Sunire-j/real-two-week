@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <style>
+        .items-img > img {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .preview-container {
+            margin-top: 50px;
+        }
+
+        .left, .right {
+            width: 500px;
+        }
+
+        .left {
+            text-align: center;
+            align-items: center;
+        }
+
+        .left > img {
+            width: 360px;
+            height: 360px;
+        }
+
+        .table-left {
+            width: 150px;
+            text-align: center;
+        }
+
+        .table-left > div {
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            padding-left: 10px;
+            background: #eee;
+        }
+
+        .table-right {
+            width: 300px;
+        }
+
+        .table-right > div {
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            padding-left: 10px;
+            min-height: 46px;
+        }
+
+        .button-container {
+            justify-content: space-between;
+            display: flex;
+            width: 400px;
+            margin: 0 auto;
+        }
+
+        .detail-container {
+            width: 1000px;
+            margin-top: 50px;
+            border: 1px solid #000;
+        }
+
+        .detail-main, .relate, .review, .support, .help {
+            width: 900px;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+
+        .detail-main > .d-flex,
+        .relate > .d-flex,
+        .review > .d-flex,
+        .support > .d-flex,
+        .help > .d-flex {
+            justify-content: space-between;
+        }
+
+        .detail-button {
+            text-align: center;
+            width: 180px;
+            border: 1px solid #000;
+            background: #eee;
+        }
+
+        .detail-active {
+            background: #f87502;
+            color: white;
+        }
+
+        .content {
+            padding: 10px;
+        }
+
+        .title {
+            font-size: 20px;
+        }
+        .item-amount{
+            margin-top: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+    <script th:inline="javascript">
+        function startScript(){
+            var id = [[${ivo.items_id}]];
+
+            $("#amount").on('change',function() {
+                if($(this).val()<0){
+                    $(this).val(0);
+                }
+            })
+            $("#buy").on('click', function(){
+                var amount = $("#amount").val().replace(/(^0+)/,"");
+                if(amount==0){
+                    alert("수량은 1개 이상이여야합니다.");
+                }
+                var url="/goods/buy?items_id="+id;
+                url+="&amount="+amount;
+                console.log(url);
+            });
+            $("#check").on('click',function(){
+                var amount = $("#amount").val().replace(/(^0+)/,"");
+                if(amount==0){
+                    alert("수량은 1개 이상이여야합니다.");
+                }
+                var url="/goods/check?items_id="+id;
+                url+="&amount="+amount;
+                $.get(url,function(data){
+                    if(data==0){
+                        alert("알 수 없는 오류가 발생했습니다!");
+                    }else if(data==-1){
+                        location.href="/";
+                    }else{
+                        openCenteredWindow('/add/success', 500, 300);
+                    }
+                })
+            });
+            $("#heart").on('click',function(){
+               var url = "/goods/add?items_id="+id;
+               console.log(url);
+            });
+
+            function openCenteredWindow(url, width, height) {
+                // 화면의 중앙 위치 계산
+                const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+                const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+                const innerWidth = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+                const innerHeight = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+                const left = ((innerWidth / 2) - (width / 2)) + screenLeft;
+                const top = ((innerHeight / 2) - (height / 2)) + screenTop;
+
+                // 팝업 창 옵션 설정
+                const windowFeatures = `width=${width},height=${height},top=${top},left=${left},resizable=no`;
+
+                // 팝업 창 열기
+                window.open(url, 'PopupWindow', windowFeatures);
+            }
+        }
+
+    </script>
+</head>
+<body>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+    <div class="preview-container d-flex">
+        <div class="left">
+            <img th:src="|/${ivo.img}|" id="item-image" alt="ALT">
+        </div>
+        <div class="right">
+            <div class="title" th:text="${ivo.name}"></div>
+            <hr/>
+            <div class="d-flex">
+                <div class="table-left">
+                    <div>판매가</div>
+                    <div>배송비</div>
+                    <div>판매자</div>
+                </div>
+                <div class="table-right">
+                    <div data-th-text="${#numbers.formatInteger(ivo.price,3,'COMMA')+'원'}"></div>
+                    <div data-th-text="${#numbers.formatInteger(ivo.delivery,3,'COMMA')+'원'}"></div>
+                    <div th:text="${ivo.seller}"></div>
+                </div>
+            </div>
+                <div class="item-amount">
+                    <label>수량선택
+                        <input type="number" id="amount" class="form-control" name="amount" value="0" min="0">
+                    </label>
+                </div>
+                <div class="button-container">
+                    <input type="button" class="btn btn-warning btn-warning-sm" value="바로구매하기" id="buy">
+                    <input type="button" class="btn btn-dark btn-dark-sm" value="장바구니 담기" id="check">
+                    <input type="button" class="btn btn-secondary btn-secondary-sm" value="관심상품" id="heart">
+                </div>
+        </div>
+
+    </div>
+
+    <div class="detail-container">
+        <div class="detail-main">
+            <div class="d-flex">
+                <div class="detail-button detail-active">상세정보</div>
+                <div class="detail-button">관련상품</div>
+                <div class="detail-button">사용후기</div>
+                <div class="detail-button">상품문의</div>
+                <div class="detail-button">배송/반품/교환</div>
+            </div>
+            <div class="content" th:text="${ivo.detail}">
+
+            </div>
+        </div>
+
+        <div class="relate">
+            <div class="d-flex">
+                <div class="detail-button">상세정보</div>
+                <div class="detail-button detail-active">관련상품</div>
+                <div class="detail-button">사용후기</div>
+                <div class="detail-button">상품문의</div>
+                <div class="detail-button">배송/반품/교환</div>
+            </div>
+            <div class="content">
+                관련상품은 뽑아줘야함
+            </div>
+        </div>
+
+        <div class="review">
+            <div class="d-flex">
+                <div class="detail-button">상세정보</div>
+                <div class="detail-button">관련상품</div>
+                <div class="detail-button detail-active">사용후기</div>
+                <div class="detail-button">상품문의</div>
+                <div class="detail-button">배송/반품/교환</div>
+            </div>
+            <div class="content">
+                사용후기 뽑아줘야함 리뷰테이블 필요
+            </div>
+        </div>
+
+        <div class="help">
+            <div class="d-flex">
+                <div class="detail-button">상세정보</div>
+                <div class="detail-button">관련상품</div>
+                <div class="detail-button">사용후기</div>
+                <div class="detail-button detail-active">상품문의</div>
+                <div class="detail-button">배송/반품/교환</div>
+            </div>
+            <div class="content">
+                상품문의 만들어야함. 그냥 게시판
+            </div>
+        </div>
+
+        <div class="support">
+            <div class="d-flex">
+                <div class="detail-button">상세정보</div>
+                <div class="detail-button">관련상품</div>
+                <div class="detail-button">사용후기</div>
+                <div class="detail-button">상품문의</div>
+                <div class="detail-button detail-active">배송/반품/교환</div>
+            </div>
+            <div class="content">
+                <strong>결제안내</strong><br/>
+                돈 안빠져나감<br/>
+                <strong>배송안내</strong><br/>
+                물건 안옴<br/>
+                <strong>교환/반품 안내</strong><br/>
+                안해줌<br/>
+                <strong>서비스 문의 안내</strong><br/>
+                문의안받음<br/>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

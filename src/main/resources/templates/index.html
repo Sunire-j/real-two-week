@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <style>
-        .item-list{
+        .item-amount{
             width: 1000px;
             display: flex;
             margin-bottom: 20px;
@@ -49,6 +49,11 @@
             align-items: center;
         }
     </style>
+    <script>
+        function startScript(){
+
+        }
+    </script>
 </head>
 <body>
 <div th:replace="fragments/header::header"></div>
@@ -87,7 +92,7 @@
         <a class="plus-button" href="#" style="color: black"><i class="fa-solid fa-plus"></i></a>
     </div>
 
-    <div class="item-list">
+    <div class="item-amount">
         <div style="font-weight: bold; text-align: center; width: 100%" th:if="${newitems.size()==0}">신상품이 없습니다.</div>
         <!--        each-items를 foreach로 뽑아주면 됨-->
         <div class="each-items"  th:each="items : ${newitems}">
@@ -107,7 +112,7 @@
         <h3 class="title">추천상품</h3>
         <a class="plus-button" href="#" style="color: black"><i class="fa-solid fa-plus"></i></a>
     </div>
-    <div class="item-list">
+    <div class="item-amount">
         <div style="font-weight: bold; text-align: center; width: 100%" th:if="${newitems.size()==0}">추천상품이 없습니다.</div>
         <!--        each-items를 foreach로 뽑아주면 됨-->
         <div class="each-items"  th:each="items : ${newitems}">

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/header.css}" rel="stylesheet">
+    <style>
+        body{
+            width: 500px;
+            height: 300px;
+        }
+        .container{
+            text-align: center;
+            margin: 0 auto;
+            margin-top: 40px;
+            width: 100%;
+        }
+        .button-container{
+            width: 300px;
+            margin: 0 auto;
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+    <script>
+        $(function(){
+            $("#continue").on('click',function(){
+                window.close();
+            })
+            $("#basket").on('click',function(){
+                window.opener.location.href="#"
+                //이 위에 장바구니 보기 페이지로 넘겨주면 됨
+                window.close();
+            })
+        })
+    </script>
+</head>
+<body>
+<div class="container">
+    <h4>장바구니 추가 성공</h4>
+    <div class="button-container">
+        <input type="button" id="continue" value="계속 쇼핑하기" class="btn btn-dark btn-sm">
+        <input type="button" id="basket" value="장바구니 보기" class="btn btn-primary btn-sm">
+    </div>
+</div>
+</body>
+</html>

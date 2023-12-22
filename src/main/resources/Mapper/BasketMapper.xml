@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.realtwoweek.Mapper.BasketMapper">
+
+    <insert id="addBasket">
+        insert into basket
+        values(#{param3}, #{param1}, #{param2});
+    </insert>
+
+    <select id="checkBasket" resultType="Integer">
+        select count(member_id)
+        from basket
+        where member_id=#{param2} and items_id=#{param1};
+    </select>
+
+    <update id="increaseAmount">
+        update basket
+        set amount=amount+#{param2}
+        where member_id=#{param3} and items_id=#{param1};
+    </update>
+</mapper>
