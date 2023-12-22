@@ -2,14 +2,19 @@ package com.example.realtwoweek.Controller;
 
 import com.example.realtwoweek.Mapper.BasketMapper;
 import com.example.realtwoweek.Mapper.MemberMapper;
+import com.example.realtwoweek.vo.BasketVO;
+import com.example.realtwoweek.vo.ItemVO;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -61,6 +66,42 @@ public class BasketController {
     @GetMapping("/add/success")
     public String loadPopup(){
         return "popUp/basket-success";
+    }
+
+    @GetMapping("/basket")
+    public String mybasket(OAuth2AuthenticationToken authentication, Model model){
+        Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
+        String provider = authentication.getAuthorizedClientRegistrationId();
+        String u_email;
+        if ("naver".equals(provider)) {
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+            u_email = (String) response.get("email");
+        } else {
+            u_email = (String) attributes.getOrDefault("email", "default_email");
+        }
+
+        Long userid = memberMapper.getUserid(provider, u_email);
+        List<BasketVO> bList = basketMapper.getAllBasket(userid);
+
+        int maxDelivery = bList.stream()
+                .mapToInt(BasketVO::getDelivery)
+                .max()
+                .orElse(0);
+
+        int total = (bList.stream()
+                .mapToInt(basket -> basket.getPrice() * basket.getAmount())
+                .sum());
+
+        System.out.println(maxDelivery);
+        System.out.println(total);
+
+        model.addAttribute("maxDelivery", maxDelivery);
+        model.addAttribute("sumPrice",total);
+
+        model.addAttribute("blist",bList);
+
+
+        return "basket/my-basket";
     }
 
 

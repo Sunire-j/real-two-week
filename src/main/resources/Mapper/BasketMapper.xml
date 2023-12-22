@@ -4,18 +4,33 @@
 
     <insert id="addBasket">
         insert into basket
-        values(#{param3}, #{param1}, #{param2});
+        values (#{param3}, #{param1}, #{param2});
     </insert>
 
     <select id="checkBasket" resultType="Integer">
         select count(member_id)
         from basket
-        where member_id=#{param2} and items_id=#{param1};
+        where member_id = #{param2}
+          and items_id = #{param1};
     </select>
 
     <update id="increaseAmount">
         update basket
-        set amount=amount+#{param2}
-        where member_id=#{param3} and items_id=#{param1};
+        set amount=amount + #{param2}
+        where member_id = #{param3}
+          and items_id = #{param1};
     </update>
+
+    <select id="getAllBasket" resultType="com.example.realtwoweek.vo.BasketVO">
+        select b.member_id as member_id,
+               b.items_id as items_id,
+               b.amount as amount,
+               i.img as img,
+               i.name as name,
+               i.price as price,
+               i.delivery as delivery
+        from basket b
+        join items i on i.items_id=b.items_id
+        where member_id = #{param1};
+    </select>
 </mapper>

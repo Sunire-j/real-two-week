@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .basket-top, .item-list {
+            margin-top: 30px;
+        }
+
+        .form-control-sm {
+            width: 100px;
+        }
+        tr, th, td{
+            text-align: center;
+            vertical-align: middle;
+        }
+        .price-container-title{
+            width: 150px;
+        }
+        .final-price{
+            border: 3px solid #f87502;
+            padding: 10px;
+        }
+
+        .final-price div{
+            font-weight: bold
+        }
+
+    </style>
+    <script>
+        function startScript(){
+
+        }
+    </script>
+</head>
+<body>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+    <div class="basket-top">
+        <h2>장바구니</h2>
+        <hr/>
+        <img src="https://malldemo01.swm.whoismall.com/skin/f_simple/images/shop/order_step01_topimg.gif">
+    </div>
+    <!--    이 아래쪽에 상품 정보 띄워주고 수량변경, 삭제, 총 결제금액등이 나와줘야함-->
+    <div class="item-list">
+        <h5>주문 리스트</h5>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col" style="width: 100px">상품이미지</th>
+                <th style="width: 250px" scope="col">상품정보</th>
+                <th style="width: 70px" scope="col">수량</th>
+                <th scope="col">상품금액</th>
+                <th scope="col">합계</th>
+                <th scope="col" style="width: 60px">삭제</th>
+                <th scope="col">배송비</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="list ,stat : ${blist}">
+                <th style="width: 100px">
+                    <img style="width: 100px" th:src="${list.img}">
+                </th>
+                <td><a style="color: black" th:href="|/goods/view?no=${list.items_id}|" th:text="${list.name}"></a></td>
+                <td>
+                    <input th:value="${list.amount}" type="number" name="amount" class="form-control form-control-sm"
+                           min="0">
+                    <input type="button" value="적용" class="btn btn-sm btn-primary">
+                </td>
+                <td th:text="${#numbers.formatInteger(list.price,3,'COMMA')+'원'}">상품금액</td>
+                <td th:text="${#numbers.formatInteger(list.price * list.amount,3,'COMMA')+'원'}">합계</td>
+                <td><div th:onclick="dropItem(${list.items_id})" class="btn btn-sm btn-danger">삭제</div></td>
+                <td th:if="${stat.last}" rowspan="${#lists.size(blist)}" th:text="${#numbers.formatInteger(maxDelivery,3,'COMMA')+'원'}">배송비</td>
+            </tr>
+            </tbody>
+        </table>
+
+<!--        여기에 최종 가격 넣어주면 끝임-->
+        <div class="final-price d-flex">
+            <div style="width: 650px; display: flex; align-items: center; font-size: 24px">총 결제 금액</div>
+            <div class="price-container-title">
+                <div>총 상품 금액</div>
+                <div>총 배송비</div>
+                <div>총 결제금액</div>
+            </div>
+            <div class="price-container">
+                <div th:text="${#numbers.formatInteger(sumPrice,3,'COMMA')+'원'}"></div>
+                <div th:text="${#numbers.formatInteger(maxDelivery,3,'COMMA')+'원'}"></div>
+               <div th:text="${#numbers.formatInteger(sumPrice+maxDelivery,3,'COMMA')+'원'}"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div th:replace="fragments/footer::footer"></div>
+</body>
+</html>
