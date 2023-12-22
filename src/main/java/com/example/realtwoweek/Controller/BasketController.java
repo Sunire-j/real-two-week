@@ -172,6 +172,13 @@ public class BasketController {
 
         model.addAttribute("blist",bList);
 
+        //유저정보도 모델에 넣어서 가져와야함
+        //그런데 이름이랑 이메일은 이미 가지고 있음
+        //그런데 이메일을 그냥 못보냄 잘라서 보내줘야함
+        String emailid = u_email.substring(0,u_email.indexOf('@'));
+        model.addAttribute("emailid", emailid);
+        String emaildomain = u_email.substring(u_email.indexOf('@')+1);
+        model.addAttribute("emaildomain",emaildomain);
         return "/items/purchase";
     }
 }

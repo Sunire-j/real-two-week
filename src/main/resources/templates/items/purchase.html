@@ -2,6 +2,115 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .items-img > img {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .left{
+            width: 250px;
+        }
+
+        .right{
+            width: 750px;
+        }
+
+        .left {
+            text-align: center;
+            align-items: center;
+        }
+
+        .left > img {
+            width: 360px;
+            height: 360px;
+        }
+
+        .table-left > div {
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            padding-left: 10px;
+            background: #eee;
+        }
+
+        .table-right > div {
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            padding-left: 10px;
+            min-height: 46px;
+        }
+
+        .button-container {
+            justify-content: space-between;
+            display: flex;
+            width: 400px;
+            margin: 0 auto;
+        }
+
+        .right > div, .left > div {
+            height: 50px;
+            align-items: flex-start;
+            vertical-align: middle;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+
+        .left {
+            background: #888;
+            border-right: 1px solid #000;
+        }
+
+        .right {
+            background: #ddd;
+        }
+
+        .order-container {
+            margin-bottom: 10px;
+        }
+
+
+    </style>
+    <script>
+        $(function () {
+            $("#domaintype").on('change', function () {
+                var domain = $(this).val();
+                if (domain == 'none') {
+                    $("#emaildomain").prop('readonly', false);
+                } else {
+                    $("#emaildomain").prop('readonly', true);
+                    $("#emaildomain").val(domain);
+                }
+            });
+
+            $("#samesame").on('change',function(){
+                if($(this).is(':checked')){
+                    //여기에서 주문자명 연락처 긴빠이쳐와야함
+                    //셀렉트도 있으니 총 4개임
+                }else{
+                    console.log('깡통');
+                }
+            });
+                var emaildomainValue = $('#emaildomain').val();
+
+                var selectElement = $('#domaintype');
+
+                var options = selectElement.find('option');
+
+                options.each(function() {
+                    var option = $(this);
+
+                    if (option.val() === emaildomainValue) {
+                        option.prop('selected', true);
+                        return false; // 반복문 종료
+                    }
+                });
+
+                $('#emaildomain').prop('readonly', true);
+        })
+    </script>
 </head>
 <body>
 <div th:replace="fragments/header::header"></div>
@@ -29,7 +138,7 @@
             <tbody>
             <tr th:each="list ,stat : ${blist}">
                 <td style="width: 100px">
-                    <img style="width: 100px" th:src="${list.img}" th:alt="${list.items_id}">
+                    <img style="width: 100px" th:src="|/${list.img}|" th:alt="${list.items_id}">
                 </td>
                 <td><a style="color: black" th:href="|/goods/view?no=${list.items_id}|" th:text="${list.name}"></a></td>
                 <td th:text="${list.amount}"></td>
@@ -42,16 +151,20 @@
             </tbody>
         </table>
 
+        <h5 style="font-weight: bold">주문자 정보</h5>
+        <hr/>
         <div class="order-container d-flex">
-            <div class="left">
+
+            <div class="left" style="width: 250px">
                 <div>주문자명</div>
                 <div>연락처</div>
                 <div>이메일</div>
             </div>
             <div class="right">
-                <div><input type="text" name="order-username" value="고길동"></div>
+                <div><input type="text" style="width: 100px" class="form-control form-control-sm" name="order-username"
+                            value="고길동"></div>
                 <div class="d-flex">
-                    <select name="tel1">
+                    <select class="form-select form-select-sm" name="tel1" style="width: 100px">
                         <option value="none">선택</option>
                         <option value="010">010</option>
                         <option value="011">011</option>
@@ -61,14 +174,69 @@
                         <option value="019">019</option>
                     </select>
                     &nbsp;-&nbsp;
-                    <input type="text" name="tel2" value="1234">
-                    <input type="text" name="tel3" value="5678">
+                    <input class="form-control form-control-sm" style="width: 100px" type="text" name="tel2"
+                           value="1234">
+                    &nbsp;-&nbsp;
+                    <input class="form-control form-control-sm" type="text" name="tel3" style="width: 100px"
+                           value="5678">
+                </div>
+                <div class="d-flex">
+                    <input type="text" style="width: 200px" name="email1" th:value="${emailid}"
+                           class="form-control form-control-sm">
+                    &nbsp;@&nbsp;
+                    <input type="text" th:value="${emaildomain}" id="emaildomain" name="email2" class="form-control form-control-sm email domain">
+                    <select style="width: 200px; margin-left: 5px" id="domaintype" name="domaintype"
+                            class="form-select form-select-sm domain">
+                        <option value="none">직접입력</option>
+                        <option value="gmail.com">gmail.com</option>
+                        <option value="naver.com">naver.com</option>
+                        <option value="daum.net">daum.net</option>
+                        <option value="kakao.com">kakao.com</option>
+                        <option value="nate.com">nate.com</option>
+                    </select>
                 </div>
             </div>
         </div>
 
-        <div class="place-container">
+        <div class="d-flex" style="justify-content: space-between">
+            <h5 style="font-weight: bold">배송 정보</h5>
+            <label>
+                <input type="checkbox" id="samesame" class="form-check-input">
+                주문자 정보와 동일
+            </label>
+        </div>
 
+        <hr/>
+        <div class="place-container d-flex">
+            <div class="left" style="width: 250px">
+                <div>수령인명</div>
+                <div>연락처</div>
+                <div>배송지 주소</div>
+                <div>배송 시 요청사항</div>
+            </div>
+            <div class="right">
+                <div><input type="text" style="width: 100px" class="form-control form-control-sm" id="receivename">
+                </div>
+                <div class="d-flex">
+                    <select class="form-select form-select-sm" id="tel1" style="width: 100px">
+                        <option value="none">선택</option>
+                        <option value="010">010</option>
+                        <option value="011">011</option>
+                        <option value="016">016</option>
+                        <option value="017">017</option>
+                        <option value="018">018</option>
+                        <option value="019">019</option>
+                    </select>
+                    &nbsp;-&nbsp;
+                    <input class="form-control form-control-sm" style="width: 100px" type="text" id="tel2"
+                           value="1234">
+                    &nbsp;-&nbsp;
+                    <input class="form-control form-control-sm" type="text" name="tel3" style="width: 100px"
+                           value="5678">
+                </div>
+                <div>배송지 주소</div>
+                <div>배송 시 요청사항</div>
+            </div>
         </div>
 
         <div class="method-container">
