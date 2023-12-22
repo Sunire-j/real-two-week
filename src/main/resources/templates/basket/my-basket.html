@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <style>
         .basket-top, .item-list {
             margin-top: 30px;
@@ -9,27 +10,49 @@
         .form-control-sm {
             width: 100px;
         }
-        tr, th, td{
+
+        tr, th, td {
             text-align: center;
             vertical-align: middle;
         }
-        .price-container-title{
+
+        .price-container-title {
             width: 150px;
         }
-        .final-price{
+
+        .final-price {
             border: 3px solid #f87502;
             padding: 10px;
         }
 
-        .final-price div{
+        .final-price div {
             font-weight: bold
         }
 
     </style>
     <script>
-        function startScript(){
-
-        }
+        $(function () {
+            $(".table").on('click', '#apply', function () {
+                var itemid = $(this).closest('td').prev('td').prev('td').find('img').attr('alt');
+                console.log(itemid + "템아이디")
+                var amount = $(this).prev('input').val();
+                //이 숫자로 요청보내면 됨.
+                //0은 안되도록 해야함
+                if (amount < 1) {
+                    alert("수량 오류! 1 이상의 수량을 선택해주세요. 삭제를 원하시면 우측 버튼을 눌러주세요");
+                    return false;
+                }
+                var url = "/basket/setAmount?itemid=" + itemid + "&amount=" + amount;
+                $.get(
+                    url, function (data) {
+                        console.log(data);
+                        if (data != 1) {
+                            alert("알 수 없는 오류 발생");
+                        }
+                        location.reload(true);
+                    });
+            });
+        })
     </script>
 </head>
 <body>
@@ -57,24 +80,28 @@
             </thead>
             <tbody>
             <tr th:each="list ,stat : ${blist}">
-                <th style="width: 100px">
-                    <img style="width: 100px" th:src="${list.img}">
-                </th>
+                <td style="width: 100px">
+                    <img style="width: 100px" th:src="${list.img}" th:alt="${list.items_id}">
+                </td>
                 <td><a style="color: black" th:href="|/goods/view?no=${list.items_id}|" th:text="${list.name}"></a></td>
                 <td>
                     <input th:value="${list.amount}" type="number" name="amount" class="form-control form-control-sm"
                            min="0">
-                    <input type="button" value="적용" class="btn btn-sm btn-primary">
+                    <input id="apply" type="button" value="적용" class="btn btn-sm btn-primary">
                 </td>
                 <td th:text="${#numbers.formatInteger(list.price,3,'COMMA')+'원'}">상품금액</td>
                 <td th:text="${#numbers.formatInteger(list.price * list.amount,3,'COMMA')+'원'}">합계</td>
-                <td><div th:onclick="dropItem(${list.items_id})" class="btn btn-sm btn-danger">삭제</div></td>
-                <td th:if="${stat.last}" rowspan="${#lists.size(blist)}" th:text="${#numbers.formatInteger(maxDelivery,3,'COMMA')+'원'}">배송비</td>
+                <td>
+                    <div id="del" class="btn btn-sm btn-danger">삭제</div>
+                </td>
+                <td th:if="${stat.last}" th:rowspan="${#lists.size(blist)}"
+                    th:text="${#numbers.formatInteger(maxDelivery,3,'COMMA')+'원'}">배송비
+                </td>
             </tr>
             </tbody>
         </table>
 
-<!--        여기에 최종 가격 넣어주면 끝임-->
+        <!--        여기에 최종 가격 넣어주면 끝임-->
         <div class="final-price d-flex">
             <div style="width: 650px; display: flex; align-items: center; font-size: 24px">총 결제 금액</div>
             <div class="price-container-title">
@@ -85,7 +112,7 @@
             <div class="price-container">
                 <div th:text="${#numbers.formatInteger(sumPrice,3,'COMMA')+'원'}"></div>
                 <div th:text="${#numbers.formatInteger(maxDelivery,3,'COMMA')+'원'}"></div>
-               <div th:text="${#numbers.formatInteger(sumPrice+maxDelivery,3,'COMMA')+'원'}"></div>
+                <div th:text="${#numbers.formatInteger(sumPrice+maxDelivery,3,'COMMA')+'원'}"></div>
             </div>
         </div>
 

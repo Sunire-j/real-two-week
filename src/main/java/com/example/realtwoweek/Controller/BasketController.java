@@ -3,17 +3,13 @@ package com.example.realtwoweek.Controller;
 import com.example.realtwoweek.Mapper.BasketMapper;
 import com.example.realtwoweek.Mapper.MemberMapper;
 import com.example.realtwoweek.vo.BasketVO;
-import com.example.realtwoweek.vo.ItemVO;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -102,6 +98,26 @@ public class BasketController {
 
 
         return "basket/my-basket";
+    }
+
+    @GetMapping("/basket/setAmount")
+    @ResponseBody
+    public int setAmount(int itemid, int amount, OAuth2AuthenticationToken authentication){
+        System.out.println(itemid +" / "+amount);
+        Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
+        String provider = authentication.getAuthorizedClientRegistrationId();
+        String u_email;
+        if ("naver".equals(provider)) {
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+            u_email = (String) response.get("email");
+        } else {
+            u_email = (String) attributes.getOrDefault("email", "default_email");
+        }
+
+        Long userid = memberMapper.getUserid(provider, u_email);
+
+        int result = basketMapper.SetAmount(userid, itemid, amount);
+        return result;
     }
 
 

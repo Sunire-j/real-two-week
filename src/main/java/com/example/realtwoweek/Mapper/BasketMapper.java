@@ -12,4 +12,6 @@ public interface BasketMapper {
     int increaseAmount(int id, int num, Long userid);
 
     List<BasketVO> getAllBasket(Long userid);
+
+    int SetAmount(Long userid, int id, int num);
 }

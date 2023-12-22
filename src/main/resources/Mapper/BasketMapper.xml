@@ -33,4 +33,10 @@
         join items i on i.items_id=b.items_id
         where member_id = #{param1};
     </select>
+
+    <update id="SetAmount">
+        update basket
+        set amount=#{param3}
+        where member_id=#{param1} and items_id=#{param2};
+    </update>
 </mapper>
