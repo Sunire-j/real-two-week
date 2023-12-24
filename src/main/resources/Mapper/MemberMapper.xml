@@ -13,4 +13,10 @@
         from member
         where member_id=#{param1};
     </select>
+
+    <select id="CheckEmail" resultType="Integer">
+        select count(email)
+        from member
+        where email=#{param1};
+    </select>
 </mapper>

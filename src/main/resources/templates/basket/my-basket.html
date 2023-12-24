@@ -36,8 +36,6 @@
                 var itemid = $(this).closest('td').prev('td').prev('td').find('img').attr('alt');
                 console.log(itemid + "템아이디")
                 var amount = $(this).prev('input').val();
-                var token = $("meta[name='_csrf']").attr("content");
-                var header = $("meta[name='_csrf_header']").attr("content");
                 if (amount < 1) {
                     alert("수량 오류! 1 이상의 수량을 선택해주세요. 삭제를 원하시면 우측 버튼을 눌러주세요");
                     return false;
@@ -47,11 +45,7 @@
                     itemid: itemid,
                     amount: amount
                 };
-                $.ajaxSetup({
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader(header, token);
-                    }
-                });
+
                 $.post(url, data, function(response) {
                     console.log(response);
                     if (response != 1) {
@@ -68,13 +62,6 @@
                 var data = {
                     itemid:itemid
                 };
-                var token = $("meta[name='_csrf']").attr("content");
-                var header = $("meta[name='_csrf_header']").attr("content");
-                $.ajaxSetup({
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader(header, token);
-                    }
-                });
                 $.post(url, data, function(response) {
                     console.log(response);
                     if (response != 1) {

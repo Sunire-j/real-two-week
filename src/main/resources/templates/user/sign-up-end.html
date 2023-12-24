@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .step {
+            width: 100%;
+            border-bottom: 2px solid #000;
+            justify-content: space-between;
+            margin-top: 100px;
+        }
+
+        .step-now, .step-arrow {
+            color: #f87502;
+            font-weight: bold;
+        }
+
+        .step-not-now {
+            color: #aaa;
+            font-weight: bold;
+        }
+
+        .button-container {
+            width: 300px;
+            margin: 0 auto;
+            justify-content: space-between;
+        }
+
+        .form-control {
+            width: 300px;
+            margin-left: 10px;
+        }
+        form{
+            padding: 30px;
+        }
+        .left-container{
+            width: 150px;
+            font-weight: bold;
+            background: #ddd;
+        }
+        .left{
+            height: 50px;
+            border: 1px solid #000;
+            border-left: 0;
+            border-right: 0;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+        .left > div{
+            margin: 0 auto;
+        }
+        .right-container{
+            background: #eee;
+            width: 790px;
+        }
+        .right{
+            display: flex;
+            align-items: center;
+            height: 50px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+        .info-title{
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            margin-top: 30px;
+        }
+        .email{
+            width: 200px;
+        }
+        .domain{
+            width: 150px;
+        }
+        select{
+            margin-left: 20px;
+        }
+        .phone{
+            width: 100px;
+        }
+        .address{
+            display: block;
+            height: 170px;
+            padding : 10px 0;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+    <!--    회원가입 상단 고정요소-->
+    <div class="step d-flex">
+        <h3 style="font-weight: bold">회원가입</h3>
+        <div><span class="step-not-now">01&nbsp;&nbsp;약관동의</span>
+            <span class="step-arrow">&nbsp;&nbsp;>&nbsp;&nbsp;</span>
+            <span class="step-not- now">02&nbsp;&nbsp;정보입력</span>
+            <span class="step-arrow">&nbsp;&nbsp;>&nbsp;&nbsp;</span>
+            <span class="step-now">03&nbsp;&nbsp;가입완료</span></div>
+    </div>
+    <!--        회원가입 상단 고정요소 끝-->
+<!--    ㅊㅋㅊㅋ 띄워주면 됨.-->
+    <div class="content">
+        <div style="text-align: center; width: 100%; font-size: 24px; font-weight: bold">가입을 축하합니다</div>
+        <div style="text-align: center; width: 100%; font-size: 20px; font-weight: bold;color: #777; margin-top: 50px;" th:text="|가입 ID : ${tempId}|"></div>
+        <div style="text-align: center; width: 100%; font-size: 20px; font-weight: bold; color:#777" th:text="|가입 E-mail : ${tempEmail}|"></div>
+        <div class="button-container d-flex">
+            <input type="button" value="로그인" class="btn btn-primary">
+            <input type="button" value="홈으로" class="btn btn-secondary" onclick="location.href='/'">
+        </div>
+    </div>
+</div>
+</body>
+</html>
