@@ -179,9 +179,13 @@ public class BasketController {
     @PostMapping("/basket/order")
     @ResponseBody
     public int orderBasket(OrderVO ovo, Authentication authentication){
+        System.out.println(ovo.toString());
         UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
         Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
         ovo.setMember_id(userid);
+        if(ovo.getMethod()!=1){
+            ovo.setMethodDetails(0);
+        }
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmm");
         String ordernum = now.format(formatter)+userid.toString();

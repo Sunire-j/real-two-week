@@ -195,7 +195,7 @@
                 orderphonenum+=$("select[name='tel1']").val()+$('input[name="tel2"]').val()+$('input[name="tel3"]').val();
                 var receivephonenum="";
                 receivephonenum+=$("#tel1").val()+$("#tel2").val()+$("#tel3").val();
-                var methodDetails=null;
+                var methodDetails=0;
                 if($("input[name='method']:checked").val()==1){
                     methodDetails=$("#account").val();
                 }
