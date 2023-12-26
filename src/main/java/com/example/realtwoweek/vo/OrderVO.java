@@ -21,7 +21,7 @@ public class OrderVO {
     private String request;
     private int zipno;
     private int method;
-    private String methodDetails;
+    private int methodDetails;
     private String orderNum;
     private int totalprice;
     private int delivery;

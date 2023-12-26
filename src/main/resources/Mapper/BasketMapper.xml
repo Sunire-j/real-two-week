@@ -91,4 +91,22 @@ where od.order_idorder=#{param1};
         where idorder=#{param1}
     </select>
 
+    <delete id="basketEmpty">
+        delete
+        from basket
+        where member_id=#{param1};
+    </delete>
+
+    <select id="getMethodName" resultType="String">
+        select name
+        from method
+        where idmethod=#{param1};
+    </select>
+
+    <select id="getMethodDetailName" resultType="String">
+        select type
+        from methoddetail
+        where detailid=#{param1};
+    </select>
+
 </mapper>

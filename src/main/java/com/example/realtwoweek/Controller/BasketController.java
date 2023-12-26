@@ -61,7 +61,7 @@ public class BasketController {
     }
 
     @GetMapping("/add/success")
-    public String loadPopup(){
+    public String loadPopup(Authentication authentication){
         return "popUp/basket-success";
     }
 
@@ -216,10 +216,14 @@ public class BasketController {
     }
 
     @GetMapping("/basket/complete")
-    public String orderComplete(Model model, int orderid){
+    public String orderComplete(Model model, int orderid, Authentication authentication){
 
         OrderVO ovo = basketMapper.getOrder(orderid);
 
+        //여기서 장바구니 비워줘야함
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        basketMapper.basketEmpty(userid);
 
         //모델에 들어갈 것
         //주문번호, 주문일자, 주문자 정보(orderVO로 다 받아오면 됨)
@@ -229,6 +233,16 @@ public class BasketController {
         System.out.println(itemslist.toString());
         model.addAttribute("blist", itemslist);
         model.addAttribute("ovo", ovo);
+        String method = basketMapper.getMethodName(ovo.getMethod());
+        model.addAttribute("method", method);
+        if(ovo.getMethod()==1){
+            String methodDetail = basketMapper.getMethodDetailName(ovo.getMethodDetails());
+            String bank = methodDetail.substring(0, methodDetail.indexOf("("));
+            String account = methodDetail.substring(methodDetail.indexOf("(")+1, methodDetail.indexOf(")"));
+            model.addAttribute("bank", bank);
+            model.addAttribute("account", account);
+
+        }
         return "items/order-complete";
     }
 }

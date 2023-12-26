@@ -27,4 +27,9 @@ public interface BasketMapper {
     void setPrice(int orderid, int sum, int maxDeliveryValue);
 
     OrderVO getOrder(int orderid);
+
+    void basketEmpty(Long userid);
+    String getMethodName(int method);
+
+    String getMethodDetailName(int methodDetail);
 }
