@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <style>
         .items-img > img {
@@ -70,10 +71,46 @@
         .order-container {
             margin-bottom: 10px;
         }
-
+        .method1>div{
+            border: 1px solid #000;
+            padding: 10px;
+        }
+        .inactive{
+            display: none;
+        }
 
     </style>
     <script>
+        function PostCode(){
+            new daum.Postcode({
+                oncomplete:function(data){
+                    var roadAddr = data.roadAddress;
+                    var extraRoadAddr = data.bname;
+
+                    console.log(extraRoadAddr);
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    console.log(extraRoadAddr);
+                    if(extraRoadAddr !== ''){
+                        extraRoadAddr = ' (' + extraRoadAddr + ')';
+                    }
+                    console.log(extraRoadAddr);
+
+                    document.getElementById('zipno').value = data.zonecode;
+                    document.getElementById("address1").value = roadAddr;
+
+                    // 참고항목 문자열이 있을 경우 해당 필드에 넣는다.
+                    if(roadAddr !== ''){
+                        document.getElementById("address3").value = extraRoadAddr;
+                    } else {
+                        document.getElementById("address3").value = '';
+                    }
+
+                }
+            }).open();
+        }
+
         $(function () {
             $("#domaintype").on('change', function () {
                 var domain = $(this).val();
@@ -91,10 +128,121 @@
                     $('#tel1').val($('select[name="tel1"]').val()).change();
                     $('#tel2').val($('input[name="tel2"]').val());
                     $('#tel3').val($('input[name="tel3"]').val());
+                    $.ajax({
+                        url:'/user/address',
+                        type:'get',
+                        success:function(address) {
+                            console.log(address);
+                            if(address.length>0){
+                                $("#zipno").val(address[0]);
+                                $("#address1").val(address[1]);
+                                $("#address2").val(address[2]);
+                                $("#address3").val(address[3]);
+                            }
+                        },
+                        error:function(error){
+                            console.log(error.responseText);
+                        }
+                    })
                 }else{
                     console.log('깡통');
                 }
             });
+
+            $('input[type=radio][name=method]').change(function() {
+                $(".method1").removeClass("inactive");
+                $(".method3").removeClass("inactive");
+                if(this.value==1){
+                    $(".method3").addClass("inactive");
+                }
+                if(this.value==2){
+                    $(".method1").addClass("inactive");
+                    $(".method3").addClass("inactive");
+                }
+                if(this.value==3){
+                    $(".method1").addClass("inactive");
+                }
+            });
+
+            $("#submit-button").on('click',function(){
+                //맨 위에서부터 체크
+                //1. 주문자 연락처
+                if($('select[name="tel1"]').val()=="none" || $('input[name="tel2"]').val()=="" ||$('input[name="tel3"]').val()==""){
+                    alert("주문자 연락처를 확인해주세요");
+                    return false;
+                }
+                //2. 수령인명
+                if($("#receivename").val()==""){
+                    alert("수령인 이름을 확인해주세요");
+                    return false;
+                }
+                //3. 수령인 연락처
+                if($("#tel1").val()=="none"||$("#tel2").val()==""||$("#tel3").val()==""){
+                    alert("수령인 연락처를 확인해주세요");
+                    return false;
+                }
+                //4. 배송지 주소
+                if($("#zipno").val()==""){
+                    alert("배송지 주소를 확인해주세요");
+                    return false;
+                }
+                //5. 동의여부
+                if(!$("#agree").is(':checked')){
+                    alert("어쩌고 저쩌고에 동의해주세요");
+                    return false;
+                }
+                var orderphonenum = "";
+                orderphonenum+=$("select[name='tel1']").val()+$('input[name="tel2"]').val()+$('input[name="tel3"]').val();
+                var receivephonenum="";
+                receivephonenum+=$("#tel1").val()+$("#tel2").val()+$("#tel3").val();
+                var methodDetails=null;
+                if($("input[name='method']:checked").val()==1){
+                    methodDetails=$("#account").val();
+                }
+                var email="";
+                email+=$("input[name='email1']").val()+"@"+$("#emaildomain").val();
+                $.ajax({
+                    url:'/basket/order',
+                    type:'post',
+                    data:{
+                        ordername:$("#order-name").val(),
+                        orderphonenum:orderphonenum,
+                        orderemail:email,
+                        receivename:$("#receivename").val(),
+                        receivephonenum:receivephonenum,
+                        zipno : $("#zipno").val(),
+                        receiveaddress1: $("#address1").val(),
+                        receiveaddress2:$("#address2").val(),
+                        receiveaddress3:$("#address3").val(),
+                        request:$("#request").val(),
+                        method:$("input[name='method']:checked").val(),
+                        methodDetails:methodDetails
+                    },
+                    success:function(result){
+                        if(result>0){
+                            var orderid = result;
+                            $.ajax({
+                                url:'/basket/addItemToOrder',
+                                type:'post',
+                                data:{
+                                    orderid : orderid
+                                },
+                                success:function(result){
+                                    location.href="/basket/complete?orderid="+orderid;
+                                },
+                                error:function(error){
+                                    console.log(error.responseText);
+                                }
+                            });
+                        }
+
+                    },
+                    error:function(error){
+                        console.log(error.responseText);
+                    }
+                })
+
+            })
                 var emaildomainValue = $('#emaildomain').val();
 
                 var selectElement = $('#domaintype');
@@ -164,36 +312,27 @@
                 <div>이메일</div>
             </div>
             <div class="right">
-                <div><input th:value="${username}" type="text" style="width: 200px" id="order-name" class="form-control form-control-sm" name="order-username"></div>
+                <div><input th:value="${username}" readonly type="text" style="width: 200px" id="order-name" class="form-control form-control-sm" name="order-username"></div>
                 <div class="d-flex">
                     <select class="form-select form-select-sm" name="tel1" style="width: 100px">
-                        <option value="none">선택</option>
-                        <option value="010">010</option>
-                        <option value="011">011</option>
-                        <option value="016">016</option>
-                        <option value="017">017</option>
-                        <option value="018">018</option>
-                        <option value="019">019</option>
+                        <option value="none" th:selected="${phone1=='none'}">선택</option>
+                        <option value="010" th:selected="${phone1=='010'}">010</option>
+                        <option value="011" th:selected="${phone1=='011'}">011</option>
+                        <option value="016" th:selected="${phone1=='016'}">016</option>
+                        <option value="017" th:selected="${phone1=='017'}">017</option>
+                        <option value="018" th:selected="${phone1=='018'}">018</option>
+                        <option value="019" th:selected="${phone1=='019'}">019</option>
                     </select>
                     &nbsp;-&nbsp;
-                    <input class="form-control form-control-sm" style="width: 100px" type="text" name="tel2">
+                    <input class="form-control form-control-sm" th:value="${phone2}" style="width: 100px" type="text" name="tel2">
                     &nbsp;-&nbsp;
-                    <input class="form-control form-control-sm" type="text" name="tel3" style="width: 100px">
+                    <input class="form-control form-control-sm" th:value="${phone3}" type="text" name="tel3" style="width: 100px">
                 </div>
                 <div class="d-flex">
-                    <input type="text" style="width: 200px" name="email1" th:value="${emailid}"
+                    <input readonly type="text" style="width: 200px" name="email1" th:value="${emailid}"
                            class="form-control form-control-sm">
                     &nbsp;@&nbsp;
-                    <input type="text" th:value="${emaildomain}" id="emaildomain" name="email2" class="form-control form-control-sm email domain">
-                    <select style="width: 200px; margin-left: 5px" id="domaintype" name="domaintype"
-                            class="form-select form-select-sm domain">
-                        <option value="none">직접입력</option>
-                        <option value="gmail.com">gmail.com</option>
-                        <option value="naver.com">naver.com</option>
-                        <option value="daum.net">daum.net</option>
-                        <option value="kakao.com">kakao.com</option>
-                        <option value="nate.com">nate.com</option>
-                    </select>
+                    <input readonly type="text" th:value="${emaildomain}" id="emaildomain" name="email2" class="form-control form-control-sm email domain">
                 </div>
             </div>
         </div>
@@ -211,7 +350,7 @@
             <div class="left" style="width: 250px">
                 <div>수령인명</div>
                 <div>연락처</div>
-                <div>배송지 주소</div>
+                <div style="height: 170px; vertical-align: middle"><p>배송지 주소</p></div>
                 <div>배송 시 요청사항</div>
             </div>
             <div class="right">
@@ -232,17 +371,65 @@
                     &nbsp;-&nbsp;
                     <input class="form-control form-control-sm" type="text" id="tel3" style="width: 100px">
                 </div>
-                <div>배송지 주소</div>
-                <div>배송 시 요청사항</div>
+                <div class="address" style="height: 170px; padding-top: 10px; padding-bottom: 10px">
+                    <div class="d-flex"><input type="text" placeholder="(우편번호)" id="zipno" name="zipno" class="form-control form-control-sm" readonly style="width: 150px;">
+                        &nbsp;&nbsp;
+                        <input type="button" id="findaddress" onclick="PostCode()" value="(우편번호찾기)" class="btn btn-sm btn-dark"></div>
+
+                    <br>
+                    <input type="text" id="address1" placeholder="(도로명주소)" name="address1" class="form-control form-control-sm" readonly style="width: 400px">
+                    <br>
+                    <div class="d-flex">
+                        <input type="text" id="address2" name="address2" placeholder="(상세주소)" class="form-control form-control-sm" style="width: 300px">
+                        <input type="text" id="address3" name="address3" placeholder="(참고항목)" class="form-control form-control-sm" readonly style="width: 300px">
+                    </div>
+
+
+                </div>
+                <div><input type="text" id="request" class="form-control form-control-sm" style="width: 500px" placeholder="배송 시 요청사항" name="request"> </div>
             </div>
         </div>
 
-        <div class="method-container">
 
+        <h5 style="font-weight: bold; margin-top: 50px">결제 방법 선택</h5>
+        <hr/>
+
+        <div class="method-container d-flex">
+            <div class="left">
+                <p>결제 방법 선택</p>
+            </div>
+            <div class="right">
+                <div class="method-radio d-flex">
+                    <div class="d-flex">
+                    <input type="radio" checked name="method" id="method1" value="1" class="form-check-input">
+                    <label for="method1">무통장입금</label></div>
+                    <div class="d-flex">
+                    <input type="radio" name="method" id="method2" value="2" class="form-check-input">
+                    <label for="method2">신용카드</label></div>
+                    <div class="d-flex">
+                    <input type="radio" name="method" id="method3" value="3" class="form-check-input">
+                    <label for="method3">가상계좌</label></div>
+                </div>
+                <div class="method-detail" style="height: fit-content">
+                    <div class="method1" >
+                        <div><label>
+                            입금인 성명<input type="text" value="홍길동" readonly>
+                        </label></div>
+                        <div class="d-flex">
+                            <label for="account">입금 계좌</label><select class="form-select form-select-sm" style="width: 400px" id="account">
+                            <option th:each=" details : ${methodDetailList}" th:value="${details.detailid}" th:text="${details.type}"></option>
+                        </select></div>
+                    </div>
+                    <div class="method3 inactive">
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="final-price d-flex">
-            <div style="width: 650px; display: flex; align-items: center; font-size: 24px">총 결제 금액</div>
+
+
+        <div class="final-price d-flex" style="margin-top: 30px;">
+            <div style="width: 650px; display: flex; align-items: center; font-size: 24px; font-weight: bold">총 결제 금액</div>
             <div class="price-container-title">
                 <div>총 상품 금액</div>
                 <div>총 배송비</div>
@@ -255,8 +442,13 @@
             </div>
         </div>
 
+        <div class="agree" style="margin-top: 30px">
+            <input type="checkbox" id="agree" class="form-check-input">
+            <label for="agree">어쩌고 저쩌고 구매동의합니다.</label>
+        </div>
+
         <div th:if="${blist.size()>0}" class="button-container d-flex" style="width: 100%">
-            <input style="margin: 0 auto; margin-top: 20px;" type="button" value="결제하기" class="btn btn-primary">
+            <input style="margin: 0 auto; margin-top: 20px;" type="button" value="결제하기" id="submit-button" class="btn btn-primary">
         </div>
 
 

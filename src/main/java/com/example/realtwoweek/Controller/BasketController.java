@@ -2,7 +2,10 @@ package com.example.realtwoweek.Controller;
 
 import com.example.realtwoweek.Mapper.BasketMapper;
 import com.example.realtwoweek.Mapper.MemberMapper;
-import com.example.realtwoweek.vo.BasketVO;
+import com.example.realtwoweek.Util.AuthenticationUtil;
+import com.example.realtwoweek.Util.UserIdentity;
+import com.example.realtwoweek.vo.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 
 @Controller
 public class BasketController {
@@ -27,26 +34,19 @@ public class BasketController {
 
     @GetMapping("/goods/check") //회원
     @ResponseBody
-    public int addBasket(@RequestParam int items_id, @RequestParam int amount, OAuth2AuthenticationToken authentication) {
+    public int addBasket(@RequestParam int items_id, @RequestParam int amount, Authentication authentication) {
         if (authentication == null) {
             return -1;
         }
 
-        Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
+        System.out.println(authentication.toString());
 
-        String provider = authentication.getAuthorizedClientRegistrationId();
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        System.out.println(userIdentity.getProvider() + " : provider");
+        System.out.println(userIdentity.getEmail()+" : email");
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
 
-        String u_email;
-        if ("naver".equals(provider)) {
-            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-            u_email = (String) response.get("email");
-        } else {
-            u_email = (String) attributes.getOrDefault("email", "default_email");
-        }
 
-        System.out.println(provider+"프로바이더");
-        System.out.println(u_email+"이메일");
-        Long userid = memberMapper.getUserid(provider, u_email);
 
         //일단 넣기 전에 이미 장바구니에 추가된 아이템인지를 알아야함
         //만약 있다면 amount만 늘리는 방향으로 가야함
@@ -66,18 +66,9 @@ public class BasketController {
     }
 
     @GetMapping("/basket")
-    public String mybasket(OAuth2AuthenticationToken authentication, Model model){
-        Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
-        String provider = authentication.getAuthorizedClientRegistrationId();
-        String u_email;
-        if ("naver".equals(provider)) {
-            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-            u_email = (String) response.get("email");
-        } else {
-            u_email = (String) attributes.getOrDefault("email", "default_email");
-        }
-
-        Long userid = memberMapper.getUserid(provider, u_email);
+    public String mybasket(Authentication authentication, Model model){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
         List<BasketVO> bList = basketMapper.getAllBasket(userid);
 
         int maxDelivery = bList.stream()
@@ -103,18 +94,9 @@ public class BasketController {
 
     @PostMapping("/basket/setAmount")
     @ResponseBody
-    public int setAmount(int itemid, int amount, OAuth2AuthenticationToken authentication){
-        Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
-        String provider = authentication.getAuthorizedClientRegistrationId();
-        String u_email;
-        if ("naver".equals(provider)) {
-            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-            u_email = (String) response.get("email");
-        } else {
-            u_email = (String) attributes.getOrDefault("email", "default_email");
-        }
-
-        Long userid = memberMapper.getUserid(provider, u_email);
+    public int setAmount(int itemid, int amount, Authentication authentication){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
 
         int result = basketMapper.SetAmount(userid, itemid, amount);
         return result;
@@ -122,36 +104,18 @@ public class BasketController {
 
     @PostMapping("/basket/dropItem")
     @ResponseBody
-    public int dropItem(int itemid, OAuth2AuthenticationToken authentication){
-        Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
-        String provider = authentication.getAuthorizedClientRegistrationId();
-        String u_email;
-        if ("naver".equals(provider)) {
-            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-            u_email = (String) response.get("email");
-        } else {
-            u_email = (String) attributes.getOrDefault("email", "default_email");
-        }
-
-        Long userid = memberMapper.getUserid(provider, u_email);
+    public int dropItem(int itemid, Authentication authentication){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
 
         int result = basketMapper.dropItem(userid, itemid);
         return result;
     }
 
     @GetMapping("/basket/purchase")
-    public String purchase(OAuth2AuthenticationToken authentication, Model model){
-        Map<String, Object> attributes = authentication.getPrincipal().getAttributes();
-        String provider = authentication.getAuthorizedClientRegistrationId();
-        String u_email;
-        if ("naver".equals(provider)) {
-            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-            u_email = (String) response.get("email");
-        } else {
-            u_email = (String) attributes.getOrDefault("email", "default_email");
-        }
-
-        Long userid = memberMapper.getUserid(provider, u_email);
+    public String purchase(Authentication authentication, Model model){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
 
         List<BasketVO> bList = basketMapper.getAllBasket(userid);
 
@@ -164,9 +128,6 @@ public class BasketController {
                 .mapToInt(basket -> basket.getPrice() * basket.getAmount())
                 .sum());
 
-        System.out.println(maxDelivery);
-        System.out.println(total);
-
         model.addAttribute("maxDelivery", maxDelivery);
         model.addAttribute("sumPrice",total);
 
@@ -175,12 +136,99 @@ public class BasketController {
         //유저정보도 모델에 넣어서 가져와야함
         //그런데 이름이랑 이메일은 이미 가지고 있음
         //그런데 이메일을 그냥 못보냄 잘라서 보내줘야함
-        String emailid = u_email.substring(0,u_email.indexOf('@'));
+
+        //폰번호는 가입때 11자리로 입력받았을거임
+        //그냥 3,4,4로 잘라서 따로 보내줘야함
+
+        String phone1="";
+        String phone2="";
+        String phone3="";
+
+        String phonenum = memberMapper.getPhonenum(userid);
+        if(phonenum==null){
+            System.out.println("폰번호 비어있음");
+        }else{
+            System.out.println("폰번호 이거임" + phonenum);
+            phone1 = phonenum.substring(0,3);
+            phone2 = phonenum.substring(3,7);
+            phone3 = phonenum.substring(7);
+        }
+
+        model.addAttribute("phone1", phone1);
+        model.addAttribute("phone2", phone2);
+        model.addAttribute("phone3", phone3);
+
+        String emailid = userIdentity.getEmail().substring(0,userIdentity.getEmail().indexOf('@'));
         model.addAttribute("emailid", emailid);
-        String emaildomain = u_email.substring(u_email.indexOf('@')+1);
+        String emaildomain = userIdentity.getEmail().substring(userIdentity.getEmail().indexOf('@')+1);
         model.addAttribute("emaildomain",emaildomain);
         String username = memberMapper.getUsername(userid);
         model.addAttribute("username", username);
+
+        //결제수단 불러와야함
+        List<MethodVO> methodVOList = basketMapper.getAllMethod();
+
+        List<MethodDetailVO> methodDetailVOList = basketMapper.getAllMethodDetail();
+
+        model.addAttribute("methodDetailList", methodDetailVOList);
+
+
         return "/items/purchase";
+    }
+
+    @PostMapping("/basket/order")
+    @ResponseBody
+    public int orderBasket(OrderVO ovo, Authentication authentication){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        ovo.setMember_id(userid);
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmm");
+        String ordernum = now.format(formatter)+userid.toString();
+        System.out.println(ordernum);
+        ovo.setOrderNum(ordernum);
+        int result = basketMapper.addNewOrder(ovo);
+        return ovo.getIdorder();
+    }
+
+    @PostMapping("/basket/addItemToOrder")
+    @ResponseBody
+    public int addItemToOrder(Authentication authentication, int orderid){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        List<BasketVO> list = basketMapper.getAllBasket(userid);
+        for(BasketVO basket : list){
+            basketMapper.addItemToOrder(basket.getItems_id(), basket.getAmount(), orderid);
+        }
+        //여기서 해야하는거? 상품별 가격 구하고, 배송비 구해서  order안에 넣어줘야함
+        int sum = list.stream()
+                .mapToInt(BasketVO::getPrice)
+                .sum();
+
+        OptionalInt maxDelivery = list.stream()
+                .mapToInt(BasketVO::getDelivery)
+                .max();
+
+        int maxDeliveryValue = maxDelivery.orElse(0);
+
+        basketMapper.setPrice(orderid, sum, maxDeliveryValue);
+        return orderid;
+    }
+
+    @GetMapping("/basket/complete")
+    public String orderComplete(Model model, int orderid){
+
+        OrderVO ovo = basketMapper.getOrder(orderid);
+
+
+        //모델에 들어갈 것
+        //주문번호, 주문일자, 주문자 정보(orderVO로 다 받아오면 됨)
+        //결제정보(ordervo안에 들어있음)
+        //배송정보(ordervo안에 들어있음)
+        List<BasketVO> itemslist = basketMapper.getOrderItemList(orderid);
+        System.out.println(itemslist.toString());
+        model.addAttribute("blist", itemslist);
+        model.addAttribute("ovo", ovo);
+        return "items/order-complete";
     }
 }

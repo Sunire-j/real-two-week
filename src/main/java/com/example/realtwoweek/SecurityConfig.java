@@ -1,7 +1,9 @@
 package com.example.realtwoweek;
 
 import com.example.realtwoweek.config.auth.OAuthService;
+import com.example.realtwoweek.service.DelegatingUserDetailsService;
 import com.example.realtwoweek.service.MemberService;
+import com.example.realtwoweek.service.NormalMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Arrays;
+
 @EnableWebSecurity
 public class SecurityConfig {
 
@@ -23,6 +27,8 @@ public class SecurityConfig {
 
     private final OAuthService oAuthService;
     private final MemberService memberService;
+    @Autowired
+    private NormalMemberService normalMemberService;
 
     public SecurityConfig(OAuthService oAuthService, MemberService memberService, PasswordEncoder passwordEncoder) {
         this.oAuthService = oAuthService;
@@ -32,6 +38,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf().disable()
                 .authorizeRequests()
@@ -48,7 +55,7 @@ public class SecurityConfig {
                 .and()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/signin", "/signup/**", "/signup", "/LoginOk").permitAll()
+                .antMatchers("/", "/signin", "/signup/**", "/signup", "/LoginOk", "/goods/view").permitAll()
                 .antMatchers("/loginInfo", "/basket/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
@@ -61,12 +68,15 @@ public class SecurityConfig {
                 .defaultSuccessUrl("/")  // 로그인 성공 후 리다이렉트 URL
                 .and();
 
-
         return http.build();
     }
+
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(memberService)
+    public void configureAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+        DelegatingUserDetailsService delegatingUserDetailsService =
+                new DelegatingUserDetailsService(Arrays.asList(normalMemberService, memberService));
+        auth
+                .userDetailsService(delegatingUserDetailsService)
                 .passwordEncoder(passwordEncoder);
     }
 

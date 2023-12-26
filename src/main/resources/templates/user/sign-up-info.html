@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <style>
         .step {
             width: 100%;
@@ -145,14 +146,18 @@
             </div>
             <div class="right-container">
                 <div class="right address">
-                    <div class="d-flex"><input type="text" id="zipno" name="zipno" class="form-control form-control-sm" readonly style="width: 150px;">
+                    <div class="d-flex"><input type="text" placeholder="(우편번호)" id="zipno" name="zipno" class="form-control form-control-sm" readonly style="width: 150px;">
                         &nbsp;&nbsp;
-                        <input type="button" id="findaddress" value="우편번호찾기" class="btn btn-sm btn-dark"></div>
+                        <input type="button" id="findaddress" onclick="PostCode()" value="(우편번호찾기)" class="btn btn-sm btn-dark"></div>
 
                     <br>
-                    <input type="text" id="address1" name="address1" class="form-control form-control-sm" readonly style="width: 400px">
+                    <input type="text" id="address1" placeholder="(도로명주소)" name="address1" class="form-control form-control-sm" readonly style="width: 400px">
                     <br>
-                    <input type="text" id="address2" name="address2" class="form-control form-control-sm" readonly style="width: 400px">
+                    <div class="d-flex">
+                        <input type="text" id="address2" name="address2" placeholder="(상세주소)" class="form-control form-control-sm" style="width: 300px">
+                        <input type="text" id="address3" name="address3" placeholder="(참고항목)" class="form-control form-control-sm" readonly style="width: 300px">
+                    </div>
+
 
                 </div>
                 <div class="right">
@@ -222,6 +227,25 @@
                     e.preventDefault();
                     return false;
                 }
+                var phonenum=null;
+                if($("#phone1").val()!='none'){
+                    phonenum=$("#phone1").val();
+                    phonenum+=$("#phone2").val();
+                    phonenum+=$("#phone3").val();
+                }
+                var zipno = null;
+                var address1 = null;
+                var address2 = null;
+                var address3 = null;
+
+                if($("#zipno").val()!=""){
+                    zipno=$("#zipno").val();
+                    address1=$("#address1").val();
+                    address3=$("#address3").val();
+                }
+                if($("#address2").val()!=""){
+                    address2=$("#address2").val();
+                }
                 $.ajax({
                     url:'/signup',
                     data:JSON.stringify({
@@ -229,12 +253,21 @@
                         email:$("#email").val()+"@"+$("#emaildomain").val(),
                         provider:"none",
                         isadmin: false,
-                        password: $("#userpwd").val()
+                        password: $("#userpwd").val(),
+                        phone:phonenum,
+                        zipno:zipno,
+                        address1: address1,
+                        address2: address2
                     }),
                     contentType: 'application/json',
                     type:'post',
                     success:function(result){
                         console.log(result+"결과");
+                        if(result>0){
+                            location.href='/signup/end';
+                        }else{
+                            location.href='/404';
+                        }
                     },
                     error:function(result){
                         console.log(result.responseText);
@@ -261,7 +294,37 @@
                 var url = '/signup/checkemail?email='+$("#email").val()+'@'+$("#emaildomain").val();
                 window.open(url, '이메일 중복검사', 'width=800; height=300;');
             })
-        })
+        });
+
+        function PostCode(){
+            new daum.Postcode({
+                oncomplete:function(data){
+                    var roadAddr = data.roadAddress;
+                    var extraRoadAddr = data.bname;
+
+                    console.log(extraRoadAddr);
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    console.log(extraRoadAddr);
+                    if(extraRoadAddr !== ''){
+                        extraRoadAddr = ' (' + extraRoadAddr + ')';
+                    }
+                    console.log(extraRoadAddr);
+
+                    document.getElementById('zipno').value = data.zonecode;
+                    document.getElementById("address1").value = roadAddr;
+
+                    // 참고항목 문자열이 있을 경우 해당 필드에 넣는다.
+                    if(roadAddr !== ''){
+                        document.getElementById("address3").value = extraRoadAddr;
+                    } else {
+                        document.getElementById("address3").value = '';
+                    }
+
+                }
+            }).open();
+        }
     </script>
 </div>
 </body>

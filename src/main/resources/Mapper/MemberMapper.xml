@@ -19,4 +19,37 @@
         from member
         where email=#{param1};
     </select>
+
+    <select id="getPhonenum" resultType="String">
+        select phone
+        from member
+        where member_id=#{param1}
+    </select>
+
+    <select id="getZipno" resultType="Integer">
+        select zipno
+        from member
+        where member_id=#{param1}
+    </select>
+
+    <select id="getAddress1" resultType="String">
+        select address1
+        from member
+        where member_id=#{param1}
+    </select>
+
+    <select id="getAddress2" resultType="String">
+        select address2
+        from member
+        where member_id=#{param1}
+    </select>
+
+    <select id="getAddress3" resultType="String">
+        select address3
+        from member
+        where member_id=#{param1}
+    </select>
+
+
+
 </mapper>
