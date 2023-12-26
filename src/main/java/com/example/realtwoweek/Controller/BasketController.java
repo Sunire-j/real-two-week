@@ -245,7 +245,6 @@ public class BasketController {
             String account = methodDetail.substring(methodDetail.indexOf("(")+1, methodDetail.indexOf(")"));
             model.addAttribute("bank", bank);
             model.addAttribute("account", account);
-
         }
         return "items/order-complete";
     }

@@ -22,17 +22,20 @@
                 <th>주문번호</th>
                 <th>주문일자</th>
                 <th>결제금액</th>
-                <th>결제방법</th>
                 <th>주문상태</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="list : ${orderVOList}">
-                <td><a style="color: black" th:text="${list.orderNum}" th:href="|/order/${list.orderNum}|"></a></td>
+                <td><a style="color: #f87502; font-weight: bold" th:text="${list.orderNum}" th:href="|/order/${list.orderNum}|"></a></td>
                 <td th:text="${list.date}"></td>
-                <td th:text="${list.totalprice+list.delivery}"></td>
-                <td th:text="${list.method}"></td>
-                <td th:text="${list.status}"></td>
+                <td th:text="${#numbers.formatInteger(list.totalprice+list.delivery,3,'COMMA')+'원'}"></td>
+                <td th:switch="${list.status}">
+                    <p th:case="0">결제대기</p>
+                    <p th:case="1">결제대기</p>
+                    <p th:case="2">결제대기</p>
+                    <p th:case="3">결제대기</p>
+                </td>
             </tr>
             </tbody>
         </table>
