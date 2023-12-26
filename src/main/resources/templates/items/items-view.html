@@ -80,7 +80,7 @@
 
         .detail-button {
             text-align: center;
-            width: 180px;
+            width: 450px;
             border: 1px solid #000;
             background: #eee;
         }
@@ -194,7 +194,6 @@
                 <div class="button-container">
                     <input type="button" class="btn btn-warning btn-warning-sm" value="바로구매하기" id="buy">
                     <input type="button" class="btn btn-dark btn-dark-sm" value="장바구니 담기" id="check">
-                    <input type="button" class="btn btn-secondary btn-secondary-sm" value="관심상품" id="heart">
                 </div>
         </div>
 
@@ -204,9 +203,6 @@
         <div class="detail-main">
             <div class="d-flex">
                 <div class="detail-button detail-active">상세정보</div>
-                <div class="detail-button">관련상품</div>
-                <div class="detail-button">사용후기</div>
-                <div class="detail-button">상품문의</div>
                 <div class="detail-button">배송/반품/교환</div>
             </div>
             <div class="content" th:text="${ivo.detail}">
@@ -214,55 +210,13 @@
             </div>
         </div>
 
-        <div class="relate">
-            <div class="d-flex">
-                <div class="detail-button">상세정보</div>
-                <div class="detail-button detail-active">관련상품</div>
-                <div class="detail-button">사용후기</div>
-                <div class="detail-button">상품문의</div>
-                <div class="detail-button">배송/반품/교환</div>
-            </div>
-            <div class="content">
-                관련상품은 뽑아줘야함
-            </div>
-        </div>
-
-        <div class="review">
-            <div class="d-flex">
-                <div class="detail-button">상세정보</div>
-                <div class="detail-button">관련상품</div>
-                <div class="detail-button detail-active">사용후기</div>
-                <div class="detail-button">상품문의</div>
-                <div class="detail-button">배송/반품/교환</div>
-            </div>
-            <div class="content">
-                사용후기 뽑아줘야함 리뷰테이블 필요
-            </div>
-        </div>
-
-        <div class="help">
-            <div class="d-flex">
-                <div class="detail-button">상세정보</div>
-                <div class="detail-button">관련상품</div>
-                <div class="detail-button">사용후기</div>
-                <div class="detail-button detail-active">상품문의</div>
-                <div class="detail-button">배송/반품/교환</div>
-            </div>
-            <div class="content">
-                상품문의 만들어야함. 그냥 게시판
-            </div>
-        </div>
-
         <div class="support">
             <div class="d-flex">
                 <div class="detail-button">상세정보</div>
-                <div class="detail-button">관련상품</div>
-                <div class="detail-button">사용후기</div>
-                <div class="detail-button">상품문의</div>
                 <div class="detail-button detail-active">배송/반품/교환</div>
             </div>
             <div class="content">
-                <strong>결제안내</strong><br/>
+                <strong>결제안내</strong>
                 돈 안빠져나감<br/>
                 <strong>배송안내</strong><br/>
                 물건 안옴<br/>

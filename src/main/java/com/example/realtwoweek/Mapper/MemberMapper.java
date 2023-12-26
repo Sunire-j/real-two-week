@@ -1,6 +1,9 @@
 package com.example.realtwoweek.Mapper;
 
+import com.example.realtwoweek.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface MemberMapper {
@@ -16,4 +19,6 @@ public interface MemberMapper {
     String getAddress1(Long uid);
     String getAddress2(Long uid);
     String getAddress3(Long uid);
+
+    List<OrderVO> getOrderList(Long uid);
 }

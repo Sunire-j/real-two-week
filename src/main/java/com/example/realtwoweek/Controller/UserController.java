@@ -6,10 +6,12 @@ import com.example.realtwoweek.Util.UserIdentity;
 import com.example.realtwoweek.domain.Member;
 import com.example.realtwoweek.repository.MemberRepository;
 import com.example.realtwoweek.service.MemberService;
+import com.example.realtwoweek.vo.OrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,5 +100,16 @@ public class UserController {
             address.add(memberMapper.getAddress3(userid));
         }
         return address;
+    }
+
+    @GetMapping("/mypage")
+//    홈이긴 한데 주문내역이랑 다를바가 없음
+    private String myPage(Authentication authentication, Model model){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        List<OrderVO> orderVOList = memberMapper.getOrderList(userid);
+        System.out.println(orderVOList);
+        model.addAttribute(orderVOList);
+        return "/user/myPageHome";
     }
 }

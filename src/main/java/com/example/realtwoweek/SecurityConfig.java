@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/", "/signin", "/signup/**", "/signup", "/LoginOk", "/goods/view").permitAll()
-                .antMatchers("/loginInfo", "/basket/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/loginInfo", "/basket/**", "/mypage").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()

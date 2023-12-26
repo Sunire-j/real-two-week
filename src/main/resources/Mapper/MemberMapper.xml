@@ -50,6 +50,13 @@
         where member_id=#{param1}
     </select>
 
+    <select id="getOrderList" resultType="com.example.realtwoweek.vo.OrderVO">
+        select *
+        from `order`
+        where member_id=#{param1}
+        order by date desc;
+    </select>
+
 
 
 </mapper>
