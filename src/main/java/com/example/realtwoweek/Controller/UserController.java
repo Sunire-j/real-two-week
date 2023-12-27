@@ -112,4 +112,9 @@ public class UserController {
         model.addAttribute(orderVOList);
         return "/user/myPageHome";
     }
+
+    @GetMapping("/mypage/delete")
+    private String deleteAccount(){
+        return "user/DeleteAccount";
+    }
 }
