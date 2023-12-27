@@ -2,6 +2,7 @@ package com.example.realtwoweek.Mapper;
 
 
 import com.example.realtwoweek.vo.ItemVO;
+import com.example.realtwoweek.vo.PagingVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public interface ItemMapper {
     List<ItemVO> getGoodsList(int category);
 
     List<ItemVO> getAllItems();
+
+    List<ItemVO> getAllItemsPaging(PagingVO pvo);
 
 }

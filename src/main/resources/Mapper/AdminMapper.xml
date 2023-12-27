@@ -13,4 +13,12 @@
         values(#{name}, #{price}, #{delivery}, #{img}, #{seller}, #{category}, #{detail});
     </insert>
 
+    <update id="UpdateItem" parameterType="com.example.realtwoweek.vo.ItemVO">
+        update items
+        set name=#{name}, price=#{price}, delivery=#{delivery},
+            img=#{img}, seller=#{seller}, category=#{category},
+            detail=#{detail}
+        where items_id=#{items_id};
+    </update>
+
 </mapper>

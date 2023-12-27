@@ -6,14 +6,14 @@
         select *
         from items
         order by date desc
-            limit 8;
+            limit 4;
     </select>
 
     <select id="getRecommendItems" resultType="com.example.realtwoweek.vo.ItemVO">
         select *
         from items
         order by date desc
-            limit 8;
+            limit 4;
     </select>
 
     <select id="getItemDetail" resultType="com.example.realtwoweek.vo.ItemVO">
@@ -29,5 +29,12 @@
     <select id="getAllItems" resultType="com.example.realtwoweek.vo.ItemVO">
         select *
         from items
+    </select>
+
+    <select id="getAllItemsPaging" resultType="com.example.realtwoweek.vo.ItemVO">
+        select *
+        from items
+        order by date desc
+        limit #{onePageRecord} offset #{offsetPoint};
     </select>
 </mapper>

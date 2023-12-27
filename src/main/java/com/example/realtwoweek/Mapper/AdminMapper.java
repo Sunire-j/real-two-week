@@ -8,4 +8,8 @@ public interface AdminMapper {
     void deleteItem(int iid);
 
     void InsertItem(ItemVO ivo);
+
+    void UpdateItem(ItemVO ivo);
+
+
 }
