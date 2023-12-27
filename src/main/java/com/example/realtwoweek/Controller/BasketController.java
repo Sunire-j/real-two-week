@@ -187,9 +187,8 @@ public class BasketController {
             ovo.setMethodDetails(0);
         }
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmmss");
         String ordernum = now.format(formatter)+userid.toString();
-        System.out.println(ordernum);
         ovo.setOrderNum(ordernum);
         int result = basketMapper.addNewOrder(ovo);
         return ovo.getIdorder();
@@ -245,6 +244,9 @@ public class BasketController {
             String account = methodDetail.substring(methodDetail.indexOf("(")+1, methodDetail.indexOf(")"));
             model.addAttribute("bank", bank);
             model.addAttribute("account", account);
+        }else{
+            //여기에서 주문진행상황 1로 바꿔줘야함
+            basketMapper.statusIncrease(orderid);
         }
         return "items/order-complete";
     }

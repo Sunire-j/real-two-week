@@ -1,7 +1,9 @@
 package com.example.realtwoweek.Mapper;
 
+import com.example.realtwoweek.vo.MemberVO;
 import com.example.realtwoweek.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.hibernate.criterion.Order;
 
 import java.util.List;
 
@@ -21,4 +23,10 @@ public interface MemberMapper {
     String getAddress3(Long uid);
 
     List<OrderVO> getOrderList(Long uid);
+
+    OrderVO getOrderDetail(Long oid);
+
+    void deleteAccount(Long uid);
+
+    MemberVO getUserInfo(Long uid);
 }

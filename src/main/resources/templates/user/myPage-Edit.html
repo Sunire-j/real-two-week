@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <style>
+        .step {
+            width: 100%;
+            border-bottom: 2px solid #000;
+            justify-content: space-between;
+            margin-top: 100px;
+        }
+
+        .step-now, .step-arrow {
+            color: #f87502;
+            font-weight: bold;
+        }
+
+        .step-not-now {
+            color: #aaa;
+            font-weight: bold;
+        }
+
+        .button-container {
+            width: 200px;
+            margin: 0 auto;
+            justify-content: space-between;
+        }
+
+        .form-control {
+            width: 300px;
+            margin-left: 10px;
+        }
+        form{
+            padding: 30px;
+        }
+        .left-container{
+            width: 150px;
+            font-weight: bold;
+            background: #ddd;
+        }
+        .left{
+            height: 50px;
+            border: 1px solid #000;
+            border-left: 0;
+            border-right: 0;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+        .left > div{
+            margin: 0 auto;
+        }
+        .right-container{
+            background: #eee;
+            width: 790px;
+        }
+        .right{
+            display: flex;
+            align-items: center;
+            height: 50px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+        .info-title{
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            margin-top: 30px;
+        }
+        .email{
+            width: 200px;
+        }
+        .domain{
+            width: 150px;
+        }
+        select{
+            margin-left: 20px;
+        }
+        .phone{
+            width: 100px;
+        }
+        .address{
+            display: block;
+            height: 170px;
+            padding : 10px 0;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+
+    <div class="button-container d-flex"
+         style="width: 600px; justify-content: space-between; margin: 0 auto; margin-top: 100px">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/mypage'" value="주문 내역">
+        <input type="button" class="btn btn-primary" onclick="location.href='/mypage/edit'" value="정보 수정">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/mypage/delete'" value="회원 탈퇴">
+    </div>
+
+    <form action="/mypage/edit" method="post" autocomplete="off" class="signup-form">
+        <input type="hidden" name="emailCheck" id="emailCheck" value="0">
+
+        <div class="info-title">필수요소</div>
+        <div class="d-flex">
+            <div class="left-container">
+                <div class="left"><div>이름</div></div>
+                <div class="left"><div>기존 비밀번호</div></div>
+                <div class="left"><div>새 비밀번호</div></div>
+                <div class="left"><div>새 비밀번호확인</div></div>
+            </div>
+            <div class="right-container">
+                <div class="right">
+                    <input type="text" th:value="${mvo.name}" id="username" name="username" class="form-control form-control-sm">
+                </div>
+                <div class="right">
+                    <input type="password" id="originpassword" name="userpwd" class="form-control form-control-sm">
+                </div>
+                <div class="right">
+                    <input type="password" id="userpwd" name="userpwd" class="form-control form-control-sm">
+                </div>
+                <div class="right">
+                    <input type="password" id="pwdcheck" name="pwdcheck" class="form-control form-control-sm">
+                </div>
+            </div>
+        </div>
+
+        <div class="info-title">추가요소</div>
+        <div class="d-flex">
+            <div class="left-container">
+                <div class="left" style="height: 170px"><div>주소</div></div>
+                <div class="left"><div>휴대전화</div></div>
+            </div>
+            <div class="right-container">
+                <div class="right address">
+                    <div class="d-flex"><input type="text" th:value="${mvo.zipno}" placeholder="(우편번호)" id="zipno" name="zipno" class="form-control form-control-sm" readonly style="width: 150px;">
+                        &nbsp;&nbsp;
+                        <input type="button" id="findaddress" onclick="PostCode()" value="(우편번호찾기)" class="btn btn-sm btn-dark"></div>
+
+                    <br>
+                    <input type="text" id="address1" th:value="${mvo.address1}" placeholder="(도로명주소)" name="address1" class="form-control form-control-sm" readonly style="width: 400px">
+                    <br>
+                    <div class="d-flex">
+                        <input type="text" id="address2" name="address2" th:value="${mvo.address2}" placeholder="(상세주소)" class="form-control form-control-sm" style="width: 300px">
+                        <input type="text" id="address3" name="address3" placeholder="(참고항목)" th:value="${mvo.address3}" class="form-control form-control-sm" readonly style="width: 300px">
+                    </div>
+
+
+                </div>
+                <div class="right">
+                    <select id="phone1" name="phone1" class="form-select form-select-sm phone">
+                        <option value="none">선택</option>
+                        <option value="010" th:selected="${phone1 == '010'}">010</option>
+                        <option value="011" th:selected="${phone1 == '011'}">011</option>
+                        <option value="016" th:selected="${phone1 == '016'}">016</option>
+                        <option value="017" th:selected="${phone1 == '017'}">017</option>
+                        <option value="018" th:selected="${phone1 == '018'}">018</option>
+                        <option value="019" th:selected="${phone1 == '019'}">019</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;-&nbsp;
+                    <input type="text" name="phone2" id="phone2" th:value="${phone2}" class="form-control form-control-sm phone" maxlength="4">
+                    &nbsp;&nbsp;&nbsp;-&nbsp;
+                    <input type="text" name="phone3" id="phone3" th:value="${phone3}" class="form-control form-control-sm phone" maxlength="4">
+                </div>
+            </div>
+        </div>
+
+    <div class="button-container d-flex" style="margin-top: 50px">
+        <input type="submit" value="수정완료" class="btn btn-primary">
+        <input type="button" value="취소" class="btn btn-secondary">
+    </div>
+
+    </form>
+
+    <script>
+        $(function(){
+
+            //회원정보 수정 유효성검사 약간해주고 수정완료누르면 submit발생하게
+            // 기존비번은 필수, 새 비번은 안치면 안바꿈
+            // 비번은 passwordEncoder를 한번 거쳐야함.
+
+
+        });
+        function PostCode(){
+            new daum.Postcode({
+                oncomplete:function(data){
+                    var roadAddr = data.roadAddress;
+                    var extraRoadAddr = data.bname;
+
+                    console.log(extraRoadAddr);
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    console.log(extraRoadAddr);
+                    if(extraRoadAddr !== ''){
+                        extraRoadAddr = ' (' + extraRoadAddr + ')';
+                    }
+                    console.log(extraRoadAddr);
+
+                    document.getElementById('zipno').value = data.zonecode;
+                    document.getElementById("address1").value = roadAddr;
+
+                    // 참고항목 문자열이 있을 경우 해당 필드에 넣는다.
+                    if(roadAddr !== ''){
+                        document.getElementById("address3").value = extraRoadAddr;
+                    } else {
+                        document.getElementById("address3").value = '';
+                    }
+
+                }
+            }).open();
+        }
+    </script>
+
+</div>
+</body>
+</html>

@@ -57,6 +57,22 @@
         order by date desc;
     </select>
 
+    <select id="getOrderDetail" resultType="com.example.realtwoweek.vo.OrderVO">
+        select *
+        from `order`
+        where orderNum=#{param1}
+    </select>
 
+    <delete id="deleteAccount">
+        delete
+        from member
+        where member_id=#{param1};
+    </delete>
+
+    <select id="getUserInfo" resultType="com.example.realtwoweek.vo.MemberVO">
+        select *
+        from member
+        where member_id=#{param1};
+    </select>
 
 </mapper>
