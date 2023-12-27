@@ -21,4 +21,16 @@
         where items_id=#{items_id};
     </update>
 
+    <select id="getOrderTotalRecord" resultType="Integer">
+        select count(idorder)
+        from `order`;
+    </select>
+
+    <select id="getOrderList" resultType="com.example.realtwoweek.vo.OrderVO">
+        select *
+        from `order`
+        order by date desc
+        limit #{onePageRecord} offset #{offsetPoint};
+    </select>
+
 </mapper>

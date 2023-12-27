@@ -30,10 +30,15 @@
 <div class="container">
     <div class="button-container d-flex">
         <input type="button" onclick="location.href='/admin/home'" class="btn btn-outline-primary" value="홈">
-        <input type="button" class="btn btn-primary" onclick="location.href='/admin/items'" value="상품관리">
-        <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/order'" value="주문관리">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/items'" value="상품관리">
+        <input type="button" class="btn btn-primary" onclick="location.href='/admin/order/waiting'" value="주문관리">
         <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/payment'" value="결제수단관리">
         <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/user'" value="회원관리">
+    </div>
+
+    <div class="button-container d-flex" style="width: 300px; margin: 0 auto; margin-top: 30px">
+        <input type="button" onclick="location.href='/admin/order/waiting'" class="btn btn-secondary" value="미완료">
+        <input type="button" class="btn btn-outline-secondary" onclick="location.href='/admin/order/complete'" value="완료">
     </div>
 
     <h1 style="margin-top: 30px">주문관리</h1>
@@ -52,59 +57,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="list : ${}">
-<!--            위 tr 반복해서 뽑아주면 됨-->
-            <td th:text="${list.name}"></td>
-            <td th:text="${list.price}"></td>
-            <td th:text="${list.delivery}"></td>
-            <td><img th:src="|/${list.img}|"></td>
-            <td th:text="${list.seller}"></td>
-            <td>
-                <div th:switch="${list.category}">
-                    <p th:case="1">남성용</p>
-                    <p th:case="2">여성용</p>
-                    <p th:case="3">악세서리</p>
-                    <p th:case="4">소품</p>
-                </div>
-            </td>
-            <td>
-                <button id="management" class="btn btn-sm btn-primary">확인</button>
-                <button id="del" class="btn btn-sm btn-danger">다음단계로 변경</button>
-                <input type="hidden" th:value="${list.items_id}">
-            </td>
+        <tr>
+
         </tr>
         </tbody>
     </table>
 
-    <input type="button" value="상품 추가" onclick="location.href='/admin/items/add'" class="btn btn-primary">
 <!--    아마 여기 아래에 페이징?-->
 
 </div>
 
 <script>
-    $(function(){
-        $(".table").on('click', '#del',function(){
-            var items_id = $(this).next('input').val();
-            var items_name = $(this).closest('td').prev('td').prev('td').prev('td').prev('td').prev('td').prev('td').text();
-            console.log(items_name);
-            if(!confirm("정말 "+items_name+"상품을 삭제하시겠습니까?")){
-                return false;
-            }
-            $.ajax({
-                url:"/admin/items/del",
-                data:{
-                    items_id:items_id
-                },
-                type:'post',
-                success:function(result){
-                    history.go(0);
-                }
-            })
-        });
-
-
-
-    })
 </script>
 <footer style="background: #ddd; text-align: center">
     <h1>푸터푸터</h1>

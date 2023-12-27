@@ -3,6 +3,7 @@ package com.example.realtwoweek.Controller;
 import com.example.realtwoweek.Mapper.AdminMapper;
 import com.example.realtwoweek.Mapper.ItemMapper;
 import com.example.realtwoweek.vo.ItemVO;
+import com.example.realtwoweek.vo.OrderVO;
 import com.example.realtwoweek.vo.PagingVO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -163,6 +164,16 @@ public class AdminController {
         adminMapper.UpdateItem(ivo);
 
         return "redirect:/admin/items";
+    }
+
+    @GetMapping("/order/waiting")
+    private String orderListWaiting(PagingVO pvo, Model model){
+        int total = adminMapper.getOrderTotalRecord();
+        pvo.setTotalRecord(total);
+        model.addAttribute("pVO", pvo);
+        List<OrderVO> list = adminMapper.getOrderList(pvo);
+        model.addAttribute("list", list);
+        return "/admin/orders";
     }
 
 
