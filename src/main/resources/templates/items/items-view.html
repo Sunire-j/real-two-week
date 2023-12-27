@@ -119,7 +119,7 @@
                 }
                 var url="/goods/buy?items_id="+id;
                 url+="&amount="+amount;
-                console.log(url);
+                location.href=url;
             });
             $("#check").on('click',function(){
                 var amount = $("#amount").val().replace(/(^0+)/,"");
@@ -137,10 +137,6 @@
                         openCenteredWindow('/add/success', 500, 300);
                     }
                 })
-            });
-            $("#heart").on('click',function(){
-               var url = "/goods/add?items_id="+id;
-               console.log(url);
             });
 
             function openCenteredWindow(url, width, height) {

@@ -19,8 +19,9 @@
         <h3>정말 회원탈퇴 하실건가요?</h3>
         <h5>이것 저것 정말 아쉬워요</h5>
     </div>
-    <div class="button-container d-flex" >
-        <input
+    <div class="button-container d-flex" style="width: 400px; margin: 0 auto; justify-content: space-between; align-items: center">
+        <input type="button" class="btn btn-lg btn-primary" value="아니오" onclick="location.href='/'">
+        <input type="button" class="btn btn-sm btn-outline-secondary" value="예" onclick="location.href='/byebye'">
     </div>
 </div>
 <div th:replace="fragments/footer::footer"></div>

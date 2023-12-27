@@ -1,14 +1,19 @@
 package com.example.realtwoweek.Controller;
 
+import com.example.realtwoweek.Mapper.BasketMapper;
 import com.example.realtwoweek.Mapper.MemberMapper;
 import com.example.realtwoweek.Util.AuthenticationUtil;
 import com.example.realtwoweek.Util.UserIdentity;
 import com.example.realtwoweek.domain.Member;
 import com.example.realtwoweek.repository.MemberRepository;
 import com.example.realtwoweek.service.MemberService;
+import com.example.realtwoweek.vo.BasketVO;
+import com.example.realtwoweek.vo.MemberVO;
 import com.example.realtwoweek.vo.OrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,21 +25,23 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 public class UserController {
 
     private final MemberService memberService;
-    private final PasswordEncoder passwordEncoder;
-    private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
+    private final BasketMapper basketMapper;
 
     @Autowired
-    public UserController(MemberService memberService, PasswordEncoder passwordEncoder, MemberRepository memberRepository, MemberMapper memberMapper) {
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserController(MemberService memberService, MemberMapper memberMapper, BasketMapper basketMapper) {
         this.memberService = memberService;
-        this.passwordEncoder = passwordEncoder;
-        this.memberRepository = memberRepository;
         this.memberMapper = memberMapper;
+        this.basketMapper = basketMapper;
     }
 
     @GetMapping("/signin")
@@ -113,8 +120,121 @@ public class UserController {
         return "/user/myPageHome";
     }
 
+    @GetMapping("/mypage/order")
+    private String orderDetail(Long no, Model model, Authentication authentication){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        OrderVO order = memberMapper.getOrderDetail(no);
+        if(!Objects.equals(userid, order.getMember_id())){
+            return "404";
+        }
+        List<BasketVO> items = basketMapper.getOrderItemList(order.getIdorder());
+        System.out.println(items);
+        model.addAttribute("ovo",order);
+        model.addAttribute("blist",items);
+        String method = basketMapper.getMethodName(order.getMethod());
+        model.addAttribute("method", method);
+        if(order.getMethod()==1){
+            String methodDetail = basketMapper.getMethodDetailName(order.getMethodDetails());
+            String bank = methodDetail.substring(0, methodDetail.indexOf("("));
+            String account = methodDetail.substring(methodDetail.indexOf("(")+1, methodDetail.indexOf(")"));
+            model.addAttribute("bank", bank);
+            model.addAttribute("account", account);
+        }
+        return "/user/myPage-orderDetail";
+    }
+
     @GetMapping("/mypage/delete")
     private String deleteAccount(){
         return "user/DeleteAccount";
+    }
+
+    @GetMapping("/byebye")
+    private String realDelete(Authentication auth){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+
+        //탈퇴하기 전에 유저에 대한 주문정보같은건 분리를 해야함
+        //멤버아이디만 null로 바꿔버림
+        basketMapper.deleteAccount(userid);
+        //바스켓같은건 날려도 괜찮
+
+        memberMapper.deleteAccount(userid);
+        return "redirect:/logout";
+    }
+    @GetMapping("/mypage/edit")
+    private String editInfo(Authentication auth, Model model){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        MemberVO memberVO = memberMapper.getUserInfo(userid);
+        if(!memberVO.getProvider().equals("none") && memberVO.getPassword()==null){
+            return "/user/set-password";
+        }
+        System.out.println(memberVO);
+        model.addAttribute("mvo",memberVO);
+        String phone1="none";
+        String phone2="";
+        String phone3="";
+
+        System.out.println("폰번호 이거임 : "+memberVO.getPhone());
+        if(memberVO.getPhone()==null || !memberVO.getPhone().equals("")){
+            System.out.println("여기들어옴");
+            phone1 = memberVO.getPhone().substring(0,3);
+            phone2 = memberVO.getPhone().substring(3,7);
+            phone3 = memberVO.getPhone().substring(7);
+        }
+        model.addAttribute("phone1", phone1);
+        model.addAttribute("phone2", phone2);
+        model.addAttribute("phone3", phone3);
+
+
+        //수정가능범위
+        //이름, 비번, 휴대폰번호, 주소, 어느아이디인지 띄워주기
+        return "/user/myPage-Edit";
+    }
+
+    @PostMapping("/mypage/checkpwd")
+    @ResponseBody
+    private boolean checkpwd(String pwd, Authentication auth){
+
+        pwd = passwordEncoder.encode(pwd);
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        String encodedpwd = memberMapper.getUserpwd(userid);
+
+        return encodedpwd.equals(pwd);
+    }
+
+    @PostMapping("/mypage/edit")
+    @ResponseBody
+    private int changeInfo(MemberVO mvo, Authentication auth){
+        System.out.println(mvo.toString());
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        mvo.setMember_id(userid);
+
+        System.out.println(mvo.getPassword());
+
+        if(mvo.getPassword()==null || mvo.getPassword().equals("")){
+            mvo.setPassword(memberMapper.getUserpwd(userid));
+            System.out.println("기존비번진입");
+        }else{
+            mvo.setPassword(passwordEncoder.encode(mvo.getPassword()));
+            System.out.println("새 비번 진입");
+        }
+
+        System.out.println(mvo.getPassword());
+
+
+        int result =  memberMapper.changeInfo(mvo);
+        if(result>0 && mvo.getPassword()!=null){
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                    auth.getPrincipal(),
+                    mvo.getPassword(),
+                    auth.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+        }
+        return result;
     }
 }

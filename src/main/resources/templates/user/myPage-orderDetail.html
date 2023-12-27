@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <style>
+        .order-container,
+        .payment-container,
+        .delivery-container{
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+
+        .order-container>div,
+        .payment-container>div,
+        .delivery-container>div{
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .left{
+            width: 250px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+    <div class="button-container d-flex"
+         style="width: 600px; justify-content: space-between; margin: 0 auto; margin-top: 100px">
+        <input type="button" class="btn btn-primary" onclick="location.href='/mypage'" value="주문 내역">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/mypage/edit'" value="정보 수정">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/mypage/delete'" value="회원 탈퇴">
+    </div>
+    <div th:switch="${ovo.status}">
+        <h2 style="font-weight: bold; margin-top: 30px;">주문확인</h2>
+        <hr/>
+    </div>
+    <div style="margin: 0 auto; text-align: center" th:switch="${ovo.status}">
+        <h3 style="color: #f87502; font-weight: bold" th:case="0">결제대기</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="1">결제완료</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="2">배송시작</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="3">배송완료</h3>
+    </div>
+    <h5 style="font-weight: bold">주문자 정보</h5>
+    <div class="order-container">
+        <div class="d-flex">
+            <div class="left">주문번호</div>
+            <div class="right" th:text="${ovo.orderNum}"></div>
+        </div>
+        <div class="d-flex">
+            <div class="left">주문일자</div>
+            <div class="right" th:text="${ovo.date}"></div>
+        </div>
+        <div class="d-flex">
+            <div class="left">주문자 정보</div>
+            <div class="right" th:text="|${ovo.ordername} / ${ovo.orderphonenum} / ${ovo.orderemail}|">주문자정보 들어갈 자리</div>
+        </div>
+    </div>
+    <h5 style="font-weight: bold; margin-top: 30px" >주문리스트</h5>
+    <div class="items-container">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col" style="width: 100px">상품이미지</th>
+                <th style="width: 250px" scope="col">상품정보</th>
+                <th style="width: 70px" scope="col">수량</th>
+                <th scope="col">상품금액</th>
+                <th scope="col">합계</th>
+                <th scope="col">배송비</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="list ,stat : ${blist}">
+                <td style="width: 100px">
+                    <img style="width: 100px" th:src="|/${list.img}|" th:alt="${list.items_id}">
+                </td>
+                <td><a style="color: black" th:href="|/goods/view?no=${list.items_id}|" th:text="${list.name}"></a></td>
+                <td th:text="${list.amount}">
+
+                </td>
+                <td th:text="${#numbers.formatInteger(list.price,3,'COMMA')+'원'}">상품금액</td>
+                <td th:text="${#numbers.formatInteger(list.price * list.amount,3,'COMMA')+'원'}">합계</td>
+                <td th:if="${stat.last}" th:rowspan="${#lists.size(blist)}"
+                    th:text="${#numbers.formatInteger(ovo.delivery,3,'COMMA')+'원'}">배송비
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <h5 style="font-weight: bold; margin-top: 30px" >결제정보</h5>
+    <div class="payment-container">
+        <div class="d-flex">
+            <div class="left">결제 방법</div>
+            <div class="right" th:text="${method}">
+            </div>
+        </div>
+        <div class="d-flex">
+            <div class="left">결제 정보</div>
+            <div class="right" th:switch="${ovo.method}">
+                <div th:case="1">
+                    <div th:text="|입금 은행명 : ${bank}|"></div>
+                    <div th:text="|입금 계좌번호 : ${account}|"></div>
+                    <div th:text="|결제 예정금액 : ${#numbers.formatInteger(ovo.totalprice+ovo.delivery,3,'COMMA')+'원'}|"></div>
+                </div>
+                <span th:case="2">
+                    <div th:text="|결제 카드 정보 : 1111-2222-****-4444|"></div>
+                    <div th:text="|승인일자 : ${ovo.date}|"></div>
+                    <div th:text="|승인금액 : ${#numbers.formatInteger(ovo.totalprice+ovo.delivery,3,'COMMA')+'원'}|"></div>
+                </span>
+                <span th:case="3">
+                     <div th:text="|결제 계좌 정보 : (가라은행) 111-2222-****-44|"></div>
+                    <div th:text="|결제 일자 : ${ovo.date}|"></div>
+                    <div th:text="|결제 금액 : ${#numbers.formatInteger(ovo.totalprice+ovo.delivery,3,'COMMA')+'원'}|"></div>
+
+                </span>
+            </div>
+        </div>
+    </div>
+    <h5 style="font-weight: bold; margin-top: 30px" >배송정보</h5>
+    <div class="delivery-container">
+        <div class="d-flex">
+            <div class="left">수령인명</div>
+            <div class="right" th:text="${ovo.receivename}"></div>
+        </div>
+        <div class="d-flex">
+            <div class="left">연락처</div>
+            <div class="right" th:text="${ovo.receivephonenum}"></div>
+        </div>
+        <div class="d-flex">
+            <div class="left">배송지 주소</div>
+            <div class="right" th:text="|(${ovo.zipno}) ${ovo.receiveaddress1} ${ovo.receiveaddress2} ${ovo.receiveaddress3}|"></div>
+        </div>
+        <div class="d-flex">
+            <div class="left">배송 시 요청사항</div>
+            <div class="right" th:text="${ovo.request}"></div>
+        </div>
+    </div>
+
+</div>
+<div th:replace="fragments/footer::footer"></div>
+</body>
+</html>

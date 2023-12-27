@@ -38,8 +38,8 @@ public class Member {
     @Column(name = "phone", nullable = true, length = 255)
     private String phone;
 
-    @Column(name = "zipno")
-    private int zipno;
+    @Column(name = "zipno", nullable = true)
+    private Integer zipno=0;
 
     @Column(name="address1")
     private String address1;
@@ -51,7 +51,7 @@ public class Member {
     private String address3;
 
     @Builder
-    public Member(String address3,int zipno,String address2,String address1,String password, Long id, String name, String email, String provider, String nickname, boolean isAdmin) {
+    public Member(String address3,Integer zipno,String address2,String address1,String password, Long id, String name, String email, String provider, String nickname, boolean isAdmin) {
         this.id = id;
         this.name = name;
         this.email = email;

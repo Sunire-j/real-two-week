@@ -32,4 +32,8 @@ public interface BasketMapper {
     String getMethodName(int method);
 
     String getMethodDetailName(int methodDetail);
+
+    void statusIncrease(int orderid);
+
+    void deleteAccount(Long uid);
 }

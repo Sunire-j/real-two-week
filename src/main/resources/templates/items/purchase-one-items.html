@@ -222,10 +222,12 @@
                         if(result>0){
                             var orderid = result;
                             $.ajax({
-                                url:'/basket/addItemToOrder',
+                                url:'/goods/addItemToOrder',
                                 type:'post',
                                 data:{
-                                    orderid : orderid
+                                    orderid : orderid,
+                                    items_id : [[${ivo.items_id}]],
+                                    amount:[[${amount}]]
                                 },
                                 success:function(result){
                                     location.href="/basket/complete?orderid="+orderid;
@@ -287,17 +289,15 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="list ,stat : ${blist}">
+            <tr>
                 <td style="width: 100px">
-                    <img style="width: 100px" th:src="|/${list.img}|" th:alt="${list.items_id}">
+                    <img style="width: 100px" th:src="|/${ivo.img}|" th:alt="${ivo.items_id}">
                 </td>
-                <td><a style="color: black" th:href="|/goods/view?no=${list.items_id}|" th:text="${list.name}"></a></td>
-                <td th:text="${list.amount}"></td>
-                <td th:text="${#numbers.formatInteger(list.price,3,'COMMA')+'원'}">상품금액</td>
-                <td th:text="${#numbers.formatInteger(list.price * list.amount,3,'COMMA')+'원'}">합계</td>
-                <td th:if="${stat.last}" th:rowspan="${#lists.size(blist)}"
-                    th:text="${#numbers.formatInteger(maxDelivery,3,'COMMA')+'원'}">배송비
-                </td>
+                <td><a style="color: black" th:href="|/goods/view?no=${ivo.items_id}|" th:text="${ivo.name}"></a></td>
+                <td th:text="${amount}"></td>
+                <td th:text="${#numbers.formatInteger(ivo.price,3,'COMMA')+'원'}">상품금액</td>
+                <td th:text="${#numbers.formatInteger(ivo.price * amount ,3,'COMMA')+'원'}">합계</td>
+                <td th:text="${#numbers.formatInteger(ivo.delivery,3,'COMMA')+'원'}">배송비</td>
             </tr>
             </tbody>
         </table>
@@ -447,9 +447,7 @@
             <label for="agree">어쩌고 저쩌고 구매동의합니다.</label>
         </div>
 
-        <div th:if="${blist.size()>0}" class="button-container d-flex" style="width: 100%">
             <input style="margin: 0 auto; margin-top: 20px;" type="button" value="결제하기" id="submit-button" class="btn btn-primary">
-        </div>
 
 
     </div>

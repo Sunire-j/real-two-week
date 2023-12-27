@@ -109,4 +109,16 @@ where od.order_idorder=#{param1};
         where detailid=#{param1};
     </select>
 
+    <update id="statusIncrease">
+        update `order`
+        set status=status+1
+        where idorder=#{param1}
+    </update>
+
+    <update id="deleteAccount">
+        update `order`
+        set member_id=null
+        where member_id=#{param1};
+    </update>
+
 </mapper>

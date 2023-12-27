@@ -57,6 +57,34 @@
         order by date desc;
     </select>
 
+    <select id="getOrderDetail" resultType="com.example.realtwoweek.vo.OrderVO">
+        select *
+        from `order`
+        where orderNum=#{param1}
+    </select>
 
+    <delete id="deleteAccount">
+        delete
+        from member
+        where member_id=#{param1};
+    </delete>
+
+    <select id="getUserInfo" resultType="com.example.realtwoweek.vo.MemberVO">
+        select *
+        from member
+        where member_id=#{param1};
+    </select>
+
+    <select id="getUserpwd" resultType="String">
+        select password
+        from member
+        where member_id=#{param1};
+    </select>
+
+    <update id="changeInfo">
+        update member
+        set name=#{name}, password=#{password}, zipno=#{zipno}, address1=#{address1}, address2=#{address2}, address3=#{address3}, phone=#{phone}
+        where member_id=#{member_id}
+    </update>
 
 </mapper>

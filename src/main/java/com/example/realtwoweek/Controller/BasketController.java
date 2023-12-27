@@ -1,6 +1,7 @@
 package com.example.realtwoweek.Controller;
 
 import com.example.realtwoweek.Mapper.BasketMapper;
+import com.example.realtwoweek.Mapper.ItemMapper;
 import com.example.realtwoweek.Mapper.MemberMapper;
 import com.example.realtwoweek.Util.AuthenticationUtil;
 import com.example.realtwoweek.Util.UserIdentity;
@@ -26,10 +27,13 @@ public class BasketController {
 
     private final BasketMapper basketMapper;
     private final MemberMapper memberMapper;
+    private final ItemMapper itemMapper;
 
-    public BasketController(BasketMapper basketMapper, MemberMapper memberMapper) {
+
+    public BasketController(BasketMapper basketMapper, MemberMapper memberMapper, ItemMapper itemMapper) {
         this.basketMapper = basketMapper;
         this.memberMapper = memberMapper;
+        this.itemMapper = itemMapper;
     }
 
     @GetMapping("/goods/check") //회원
@@ -187,9 +191,8 @@ public class BasketController {
             ovo.setMethodDetails(0);
         }
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmmss");
         String ordernum = now.format(formatter)+userid.toString();
-        System.out.println(ordernum);
         ovo.setOrderNum(ordernum);
         int result = basketMapper.addNewOrder(ovo);
         return ovo.getIdorder();
@@ -245,7 +248,69 @@ public class BasketController {
             String account = methodDetail.substring(methodDetail.indexOf("(")+1, methodDetail.indexOf(")"));
             model.addAttribute("bank", bank);
             model.addAttribute("account", account);
+        }else{
+            //여기에서 주문진행상황 1로 바꿔줘야함
+            basketMapper.statusIncrease(orderid);
         }
         return "items/order-complete";
+    }
+
+    @GetMapping("/goods/buy")
+    public String oneitemOrder(int items_id, int amount, Authentication auth, Model model){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+
+        ItemVO ivo = itemMapper.getItemDetail(items_id);
+        model.addAttribute("maxDelivery", ivo.getDelivery());
+        model.addAttribute("sumPrice",ivo.getPrice()*amount);
+        model.addAttribute("ivo", ivo);
+
+        String phone1="";
+        String phone2="";
+        String phone3="";
+
+        String phonenum = memberMapper.getPhonenum(userid);
+        if(phonenum==null){
+            System.out.println("폰번호 비어있음");
+        }else{
+            phone1 = phonenum.substring(0,3);
+            phone2 = phonenum.substring(3,7);
+            phone3 = phonenum.substring(7);
+        }
+        model.addAttribute("amount", amount);
+
+        model.addAttribute("phone1", phone1);
+        model.addAttribute("phone2", phone2);
+        model.addAttribute("phone3", phone3);
+
+        String emailid = userIdentity.getEmail().substring(0,userIdentity.getEmail().indexOf('@'));
+        model.addAttribute("emailid", emailid);
+        String emaildomain = userIdentity.getEmail().substring(userIdentity.getEmail().indexOf('@')+1);
+        model.addAttribute("emaildomain",emaildomain);
+        String username = memberMapper.getUsername(userid);
+        model.addAttribute("username", username);
+
+        //결제수단 불러와야함
+        List<MethodVO> methodVOList = basketMapper.getAllMethod();
+
+        List<MethodDetailVO> methodDetailVOList = basketMapper.getAllMethodDetail();
+
+        model.addAttribute("methodDetailList", methodDetailVOList);
+
+
+        return "items/purchase-one-items";
+
+    }
+
+    @PostMapping("/goods/addItemToOrder")
+    @ResponseBody
+    private int oneItemPurchase(int orderid, int items_id, int amount){
+        System.out.println(orderid);
+        System.out.println(items_id);
+        System.out.println(amount);
+        basketMapper.addItemToOrder(items_id, amount, orderid);
+        ItemVO ivo = itemMapper.getItemDetail(items_id);
+        basketMapper.setPrice(orderid, ivo.getPrice()*amount, ivo.getDelivery());
+        return orderid;
     }
 }
