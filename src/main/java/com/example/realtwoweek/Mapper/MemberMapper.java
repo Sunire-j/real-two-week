@@ -29,4 +29,9 @@ public interface MemberMapper {
     void deleteAccount(Long uid);
 
     MemberVO getUserInfo(Long uid);
+
+    String getUserpwd(Long uid);
+
+    int changeInfo(MemberVO mvo);
+
 }

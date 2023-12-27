@@ -11,7 +11,9 @@ import com.example.realtwoweek.vo.BasketVO;
 import com.example.realtwoweek.vo.MemberVO;
 import com.example.realtwoweek.vo.OrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +33,9 @@ public class UserController {
     private final MemberService memberService;
     private final MemberMapper memberMapper;
     private final BasketMapper basketMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserController(MemberService memberService, MemberMapper memberMapper, BasketMapper basketMapper) {
@@ -170,7 +175,10 @@ public class UserController {
         String phone1="none";
         String phone2="";
         String phone3="";
-        if(memberVO.getPhone()!=null){
+
+        System.out.println("폰번호 이거임 : "+memberVO.getPhone());
+        if(memberVO.getPhone()==null || !memberVO.getPhone().equals("")){
+            System.out.println("여기들어옴");
             phone1 = memberVO.getPhone().substring(0,3);
             phone2 = memberVO.getPhone().substring(3,7);
             phone3 = memberVO.getPhone().substring(7);
@@ -182,7 +190,51 @@ public class UserController {
 
         //수정가능범위
         //이름, 비번, 휴대폰번호, 주소, 어느아이디인지 띄워주기
-        return "/user/myPage-Edit" +
-                "";
+        return "/user/myPage-Edit";
+    }
+
+    @PostMapping("/mypage/checkpwd")
+    @ResponseBody
+    private boolean checkpwd(String pwd, Authentication auth){
+
+        pwd = passwordEncoder.encode(pwd);
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        String encodedpwd = memberMapper.getUserpwd(userid);
+
+        return encodedpwd.equals(pwd);
+    }
+
+    @PostMapping("/mypage/edit")
+    @ResponseBody
+    private int changeInfo(MemberVO mvo, Authentication auth){
+        System.out.println(mvo.toString());
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        mvo.setMember_id(userid);
+
+        System.out.println(mvo.getPassword());
+
+        if(mvo.getPassword()==null || mvo.getPassword().equals("")){
+            mvo.setPassword(memberMapper.getUserpwd(userid));
+            System.out.println("기존비번진입");
+        }else{
+            mvo.setPassword(passwordEncoder.encode(mvo.getPassword()));
+            System.out.println("새 비번 진입");
+        }
+
+        System.out.println(mvo.getPassword());
+
+
+        int result =  memberMapper.changeInfo(mvo);
+        if(result>0 && mvo.getPassword()!=null){
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                    auth.getPrincipal(),
+                    mvo.getPassword(),
+                    auth.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+        }
+        return result;
     }
 }
