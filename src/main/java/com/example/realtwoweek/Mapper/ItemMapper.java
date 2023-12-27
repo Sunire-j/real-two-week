@@ -16,4 +16,6 @@ public interface ItemMapper {
 
     List<ItemVO> getGoodsList(int category);
 
+    List<ItemVO> getAllItems();
+
 }

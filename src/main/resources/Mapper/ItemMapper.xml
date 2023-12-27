@@ -25,4 +25,9 @@
     <select id="getGoodsList" resultType="com.example.realtwoweek.vo.ItemVO">
         select * from items where category=#{param1};
     </select>
+
+    <select id="getAllItems" resultType="com.example.realtwoweek.vo.ItemVO">
+        select *
+        from items
+    </select>
 </mapper>

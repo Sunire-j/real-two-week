@@ -34,4 +34,9 @@ public class HomeController{
         model.addAttribute("newitems", Newlist);
         return "index";
     }
+
+    @GetMapping("/error")
+    public String errorPage(){
+        return "error";
+    }
 }
