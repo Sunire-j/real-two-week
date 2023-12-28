@@ -99,4 +99,27 @@
         where detailid=#{detailid};
     </update>
 
+    <select id="getTotalUserCount" resultType="Integer">
+        select count(member_id)
+        from member;
+    </select>
+
+    <select id="getUser" resultType="com.example.realtwoweek.vo.MemberVO">
+        select *
+        from member
+        limit #{onePageRecord} offset #{offsetPoint};
+    </select>
+
+    <select id="getTotalBuy" resultType="Integer">
+        select ifnull(sum(ifnull(totalprice,0)+ifnull(delivery,0)),0)
+        from `order`
+        where member_id=#{param1} and status=3;
+    </select>
+
+    <delete id="deleteMember">
+        delete
+        from member
+        where member_id=#{param1};
+    </delete>
+
 </mapper>

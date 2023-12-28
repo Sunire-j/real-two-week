@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/f5234bf2d4.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/header.css}" rel="stylesheet">
+    <style>
+        .button-container {
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+
+        td > img {
+            width: 200px;
+            height: 200px;
+        }
+        p{
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<header style="background: #f87502; text-align: center;">
+    <h1>관리자페이지</h1>
+</header>
+<div class="container">
+    <div class="button-container d-flex">
+        <input type="button" onclick="location.href='/admin/home'" class="btn btn-outline-primary" value="홈">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/items'" value="상품관리">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/order/waiting'"
+               value="주문관리">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/payment'" value="결제수단관리">
+        <input type="button" class="btn btn-primary" onclick="location.href='/admin/user'" value="회원관리">
+    </div>
+
+
+    <h1 style="margin-top: 30px">회원관리</h1>
+
+    <table class="table table-hover" style="margin-top: 50px">
+        <thead>
+        <tr>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>소셜여부</th>
+            <th>휴대폰번호</th>
+            <th>주소확인</th>
+            <th>누적구매금액</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="list : ${List}">
+            <td th:text="${list.name}"></td>
+            <td th:text="${list.email}"></td>
+            <td th:switch="${list.provider}">
+                <p th:case="naver">네이버</p>
+                <p th:case="google">구글</p>
+            </td>
+            <td th:text="${list.phone}"></td>
+            <td>
+                <button class="btn btn-sm btn-dark check" th:if="${list.zipno!=0}">주소확인</button>
+                <input type="hidden" th:value="|(${list.zipno}) ${list.address1} ${list.address2} ${list.address3}|">
+                <button class="btn btn-sm btn-outline-dark" th:if="${list.zipno==0}">주소없음</button>
+
+            </td>
+            <td >
+                <p th:if="${list.totalBuy==0}">0원</p>
+                <p th:if="${list.totalBuy!=0}" th:text="${#numbers.formatInteger(list.totalBuy,3,'COMMA')+'원'}"></p>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-danger del">강제탈퇴</button>
+                <input type="hidden" th:value="${list.member_id}">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    <!--    아마 여기 아래에 페이징?-->
+
+    <div class="pagination-container d-flex" style="margin: 0 auto; margin-top: 20px; width: fit-content">
+        <div class="pagination" style="display: flex">
+            <div class="paging d-flex">
+                <div th:if="${pVO.page > 1}">
+                    <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${pVO.page - 1}'|"><
+                    </button>
+                </div>
+                <div th:each="i : ${#numbers.sequence(pVO.startPage, pVO.startPage + pVO.onePageCount - 1)}"
+                     th:if="${i <= pVO.totalPage}">
+                    <div th:if="${i != pVO.page}">
+                        <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${i}'|">[[${i}]]
+                        </button>
+                    </div>
+                    <div th:unless="${i != pVO.page}">
+                        <strong class="btn btn-outline-secondary" style="font-weight: bold">[[${i}]]</strong>
+                    </div>
+                </div>
+                <div th:if="${pVO.page < pVO.totalPage}">
+                    <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${pVO.page + 1}'|">>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(function(){
+        $(".table").on('click','.check',function(){
+            var text = $(this).next('input').val();
+            alert(text);
+        });
+        $(".table").on('click','.del',function(){
+            var memberid=$(this).next('input').val();
+            var name = $(this).closest('td').prev('td').prev('td').prev('td').prev('td').prev('td').prev('td').text();
+            console.log(memberid +", "+name);
+            if(!confirm("정말 "+name+"유저를 탈퇴시키겠습니까?")){
+                return false;
+            }
+            $.post("/admin/user/del",{member_id:memberid}, function(result){
+                if(result<1){
+                    alert("알 수 없는 오류 발생");
+                }
+                location.reload();
+            })
+        })
+    })
+</script>
+<footer style="background: #ddd; text-align: center">
+    <h1>푸터푸터</h1>
+</footer>
+</body>
+</html>

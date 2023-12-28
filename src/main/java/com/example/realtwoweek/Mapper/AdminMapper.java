@@ -1,9 +1,6 @@
 package com.example.realtwoweek.Mapper;
 
-import com.example.realtwoweek.vo.ItemVO;
-import com.example.realtwoweek.vo.MethodDetailVO;
-import com.example.realtwoweek.vo.OrderVO;
-import com.example.realtwoweek.vo.PagingVO;
+import com.example.realtwoweek.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.aspectj.weaver.ast.Or;
 
@@ -36,5 +33,13 @@ public interface AdminMapper {
     MethodDetailVO getMethodDetailDetail(int id);
 
     void editMethodDetail(MethodDetailVO mdvo);
+
+    int getTotalUserCount();
+
+    List<MemberVO> getUser(PagingVO pvo);
+
+    int getTotalBuy(Long uid);
+
+    int deleteMember(Long uid);
 
 }

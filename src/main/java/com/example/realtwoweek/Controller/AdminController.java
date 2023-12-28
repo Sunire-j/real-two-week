@@ -263,6 +263,24 @@ public class AdminController {
         return adminMapper.deleteMethodDetail(id);
     }
 
+    @GetMapping("/user")
+    private String user(PagingVO pvo, Model model){
+        pvo.setTotalRecord(adminMapper.getTotalUserCount());
+        List<MemberVO> list = adminMapper.getUser(pvo);
+        model.addAttribute("List", list);
+        model.addAttribute("pVO", pvo);
+        for(MemberVO newList : list){
+            newList.setTotalBuy(adminMapper.getTotalBuy(newList.getMember_id()));
+            System.out.println(newList.getTotalBuy());
+        }
+        return "admin/user";
+    }
+
+    @PostMapping("/user/del")
+    @ResponseBody
+    private int userDel(Long member_id){
+        return adminMapper.deleteMember(member_id);
+    }
 
 
 }
