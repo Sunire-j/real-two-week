@@ -3,10 +3,7 @@ package com.example.realtwoweek.Controller;
 import com.example.realtwoweek.Mapper.AdminMapper;
 import com.example.realtwoweek.Mapper.BasketMapper;
 import com.example.realtwoweek.Mapper.ItemMapper;
-import com.example.realtwoweek.vo.BasketVO;
-import com.example.realtwoweek.vo.ItemVO;
-import com.example.realtwoweek.vo.OrderVO;
-import com.example.realtwoweek.vo.PagingVO;
+import com.example.realtwoweek.vo.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -216,6 +213,55 @@ public class AdminController {
         return "admin/orders-finish";
     }
 
+    @GetMapping("/payment")
+    private String payment(PagingVO pvo, Model model){
+        int totalRecord = adminMapper.getMethodDetailCount();
+        pvo.setTotalRecord(totalRecord);
+        List<MethodDetailVO> methodlist = adminMapper.getAllMethodDetail(pvo);
+        for(MethodDetailVO newlist : methodlist){
+            newlist.setBank(newlist.getType().substring(0,newlist.getType().indexOf("(")));
+            newlist.setAccount(newlist.getType().substring(newlist.getType().indexOf("(")+1,newlist.getType().indexOf(")")));;
+        }
+        model.addAttribute("list",methodlist);
+
+        model.addAttribute("pVO", pvo);
+        return "admin/payment";
+    }
+
+    @GetMapping("/payment/edit")
+    private String paymentEdit(Model model, int id){
+        MethodDetailVO methodDetailVO = adminMapper.getMethodDetailDetail(id);
+        methodDetailVO.setBank(methodDetailVO.getType().substring(0,methodDetailVO.getType().indexOf("(")));
+        methodDetailVO.setAccount(methodDetailVO.getType().substring(methodDetailVO.getType().indexOf("(")+1,methodDetailVO.getType().indexOf(")")));;
+        model.addAttribute("vo", methodDetailVO);
+        return "admin/payment-edit";
+    }
+
+    @PostMapping("/payment/edit")
+    private String paymentEditOk(MethodDetailVO mdvo){
+        System.out.println(mdvo);
+        mdvo.setType(mdvo.getBank()+"("+mdvo.getAccount()+")");
+        adminMapper.editMethodDetail(mdvo);
+        return "redirect:/admin/payment";
+    }
+
+    @GetMapping("payment/add")
+    private String paymentAdd(){
+        return "admin/payment-add";
+    }
+
+    @PostMapping("payment/add")
+    private String paymentAddOk(MethodDetailVO mdvo){
+        mdvo.setType(mdvo.getBank()+"("+mdvo.getAccount()+")");
+        adminMapper.addMethodDetail(mdvo);
+        return "redirect:/admin/payment/";
+    }
+
+    @PostMapping("/payment/del")
+    @ResponseBody
+    private int paymentDel(int id){
+        return adminMapper.deleteMethodDetail(id);
+    }
 
 
 

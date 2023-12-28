@@ -5,60 +5,98 @@
     <delete id="deleteItem">
         delete
         from items
-        where items_id=#{param1};
+        where items_id = #{param1};
     </delete>
 
     <insert id="InsertItem" parameterType="com.example.realtwoweek.vo.ItemVO">
         insert into items(name, price, delivery, img, seller, category, detail)
-        values(#{name}, #{price}, #{delivery}, #{img}, #{seller}, #{category}, #{detail});
+        values (#{name}, #{price}, #{delivery}, #{img}, #{seller}, #{category}, #{detail});
     </insert>
 
     <update id="UpdateItem" parameterType="com.example.realtwoweek.vo.ItemVO">
         update items
-        set name=#{name}, price=#{price}, delivery=#{delivery},
-            img=#{img}, seller=#{seller}, category=#{category},
+        set name=#{name},
+            price=#{price},
+            delivery=#{delivery},
+            img=#{img},
+            seller=#{seller},
+            category=#{category},
             detail=#{detail}
-        where items_id=#{items_id};
+        where items_id = #{items_id};
     </update>
 
     <select id="getOrderTotalRecord" resultType="Integer">
         select count(idorder)
         from `order`
-        where status!=3
+        where status != 3
     </select>
 
     <select id="getOrderList" resultType="com.example.realtwoweek.vo.OrderVO">
         select *
         from `order`
-        where status!=3
+        where status != 3
         order by date desc
         limit #{onePageRecord} offset #{offsetPoint};
     </select>
 
     <update id="orderNextStep">
         update `order`
-        set status=status+1
-        where orderNum=#{param1};
+        set status=status + 1
+        where orderNum = #{param1};
     </update>
 
     <select id="getOrderDetail" resultType="com.example.realtwoweek.vo.OrderVO">
         select *
         from `order`
-        where orderNum=#{param1}
+        where orderNum = #{param1}
     </select>
 
     <select id="getOrderCompleteTotalRecord" resultType="Integer">
         select count(idorder)
         from `order`
-        where status=3;
-</select>
+        where status = 3;
+    </select>
 
     <select id="getOrderListComplete" resultType="com.example.realtwoweek.vo.OrderVO">
         select *
         from `order`
-        where status=3
+        where status = 3
         order by date desc
         limit #{onePageRecord} offset #{offsetPoint};
     </select>
+
+    <select id="getAllMethodDetail" resultType="com.example.realtwoweek.vo.MethodDetailVO">
+        select *
+        from methoddetail
+        limit #{onePageRecord} offset #{offsetPoint};
+    </select>
+
+    <select id="getMethodDetailCount" resultType="Integer">
+        select count(idmethod)
+        from methoddetail;
+    </select>
+
+    <insert id="addMethodDetail" parameterType="com.example.realtwoweek.vo.MethodDetailVO">
+        insert into methoddetail(idmethod, type, name)
+        values (1, #{type}, #{name});
+    </insert>
+
+    <delete id="deleteMethodDetail">
+        delete
+        from methoddetail
+        where detailid = #{param1};
+    </delete>
+
+    <select id="getMethodDetailDetail" resultType="com.example.realtwoweek.vo.MethodDetailVO">
+        select *
+        from methoddetail
+        where detailid=#{param1};
+    </select>
+
+    <update id="editMethodDetail" parameterType="com.example.realtwoweek.vo.MethodDetailVO">
+        update methoddetail
+        set type=#{type}, name=#{name}
+        where detailid=#{detailid};
+    </update>
 
 </mapper>

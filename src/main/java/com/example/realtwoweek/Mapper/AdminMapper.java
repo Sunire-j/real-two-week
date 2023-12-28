@@ -1,6 +1,7 @@
 package com.example.realtwoweek.Mapper;
 
 import com.example.realtwoweek.vo.ItemVO;
+import com.example.realtwoweek.vo.MethodDetailVO;
 import com.example.realtwoweek.vo.OrderVO;
 import com.example.realtwoweek.vo.PagingVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,5 +26,15 @@ public interface AdminMapper {
     OrderVO getOrderDetail(String no);
     int getOrderCompleteTotalRecord();
     List<OrderVO> getOrderListComplete(PagingVO pvo);
+    List<MethodDetailVO> getAllMethodDetail(PagingVO pvo);
+
+    int getMethodDetailCount();
+
+    void addMethodDetail(MethodDetailVO mdvo);
+
+    int deleteMethodDetail(int no);
+    MethodDetailVO getMethodDetailDetail(int id);
+
+    void editMethodDetail(MethodDetailVO mdvo);
 
 }
