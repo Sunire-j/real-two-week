@@ -66,7 +66,7 @@ public class BasketController {
 
     @GetMapping("/add/success")
     public String loadPopup(Authentication authentication){
-        return "popUp/basket-success";
+        return "th/popUp/basket-success";
     }
 
     @GetMapping("/basket")
@@ -93,7 +93,7 @@ public class BasketController {
         model.addAttribute("blist",bList);
 
 
-        return "basket/my-basket";
+        return "th/basket/my-basket";
     }
 
     @PostMapping("/basket/setAmount")
@@ -177,7 +177,7 @@ public class BasketController {
         model.addAttribute("methodDetailList", methodDetailVOList);
 
 
-        return "/items/purchase";
+        return "th/items/purchase";
     }
 
     @PostMapping("/basket/order")
@@ -252,7 +252,7 @@ public class BasketController {
             //여기에서 주문진행상황 1로 바꿔줘야함
             basketMapper.statusIncrease(orderid);
         }
-        return "items/order-complete";
+        return "th/items/order-complete";
     }
 
     @GetMapping("/goods/buy")
@@ -298,7 +298,7 @@ public class BasketController {
         model.addAttribute("methodDetailList", methodDetailVOList);
 
 
-        return "items/purchase-one-items";
+        return "th/items/purchase-one-items";
 
     }
 

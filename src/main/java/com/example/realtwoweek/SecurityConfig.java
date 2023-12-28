@@ -40,9 +40,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/css/**", "/img/**", "/upload/**", "/js/**").permitAll()
+                .antMatchers("/**").permitAll()
+                .antMatchers("/order/confirm").permitAll()
                 .and()
                 .headers().frameOptions().disable()
                 .and()
@@ -66,7 +68,8 @@ public class SecurityConfig {
                 .usernameParameter("userid")
                 .passwordParameter("userpwd")// 로그인 처리 URL
                 .defaultSuccessUrl("/")  // 로그인 성공 후 리다이렉트 URL
-                .and();
+                .and()
+                .headers().frameOptions().sameOrigin();
 
         return http.build();
     }

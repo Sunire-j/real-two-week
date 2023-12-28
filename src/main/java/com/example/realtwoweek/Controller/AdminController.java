@@ -34,7 +34,7 @@ public class AdminController {
 
     @GetMapping("/home")
     public String adminhome(){
-        return "/admin/home";
+        return "th/admin/home";
     }
 
     @GetMapping("/items")
@@ -45,7 +45,7 @@ public class AdminController {
         System.out.println(pvo.toString());
         model.addAttribute("itemList", list);
         model.addAttribute("pVO",pvo);
-        return "admin/items";
+        return "th/admin/items";
     }
 
     @PostMapping("/items/del")
@@ -57,7 +57,7 @@ public class AdminController {
 
     @GetMapping("/items/add")
     public String itemAdd(){
-        return "admin/item-add";
+        return "th/admin/item-add";
     }
 
     @PostMapping("/items/add")
@@ -113,7 +113,7 @@ public class AdminController {
     private String itemEdit(int items_id, Model model){
         ItemVO itemVO = itemMapper.getItemDetail(items_id);
         model.addAttribute(itemVO);
-        return "/admin/item-edit";
+        return "th/admin/item-edit";
     }
     @PostMapping("/items/edit")
     private String itemEditOk(String name,
@@ -174,7 +174,7 @@ public class AdminController {
         model.addAttribute("pVO", pvo);
         List<OrderVO> list = adminMapper.getOrderList(pvo);
         model.addAttribute("list", list);
-        return "admin/orders-waiting";
+        return "th/admin/orders-waiting";
     }
 
     @PostMapping("/order/nextStep")
@@ -200,7 +200,7 @@ public class AdminController {
             model.addAttribute("bank", bank);
             model.addAttribute("account", account);
         }
-        return "admin/order-detail";
+        return "th/admin/order-detail";
     }
 
     @GetMapping("/order/complete")
@@ -210,7 +210,7 @@ public class AdminController {
         model.addAttribute("pVO", pvo);
         List<OrderVO> list = adminMapper.getOrderListComplete(pvo);
         model.addAttribute("list", list);
-        return "admin/orders-finish";
+        return "th/admin/orders-finish";
     }
 
     @GetMapping("/payment")
@@ -225,7 +225,7 @@ public class AdminController {
         model.addAttribute("list",methodlist);
 
         model.addAttribute("pVO", pvo);
-        return "admin/payment";
+        return "th/admin/payment";
     }
 
     @GetMapping("/payment/edit")
@@ -234,7 +234,7 @@ public class AdminController {
         methodDetailVO.setBank(methodDetailVO.getType().substring(0,methodDetailVO.getType().indexOf("(")));
         methodDetailVO.setAccount(methodDetailVO.getType().substring(methodDetailVO.getType().indexOf("(")+1,methodDetailVO.getType().indexOf(")")));;
         model.addAttribute("vo", methodDetailVO);
-        return "admin/payment-edit";
+        return "th/admin/payment-edit";
     }
 
     @PostMapping("/payment/edit")
@@ -247,7 +247,7 @@ public class AdminController {
 
     @GetMapping("payment/add")
     private String paymentAdd(){
-        return "admin/payment-add";
+        return "th/admin/payment-add";
     }
 
     @PostMapping("payment/add")
@@ -273,13 +273,19 @@ public class AdminController {
             newList.setTotalBuy(adminMapper.getTotalBuy(newList.getMember_id()));
             System.out.println(newList.getTotalBuy());
         }
-        return "admin/user";
+        return "th/admin/user";
     }
 
     @PostMapping("/user/del")
     @ResponseBody
     private int userDel(Long member_id){
         return adminMapper.deleteMember(member_id);
+    }
+
+    @PostMapping("/order/prevStep")
+    @ResponseBody
+    private int prevStep(String orderNum){
+        return adminMapper.cancleOrder(orderNum);
     }
 
 

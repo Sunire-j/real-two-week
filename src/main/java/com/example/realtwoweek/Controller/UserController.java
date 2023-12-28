@@ -46,7 +46,7 @@ public class UserController {
 
     @GetMapping("/signin")
     public String Login() {
-        return "user/sign-in";
+        return "th/user/sign-in";
     }
 
     @GetMapping("/signup/checkemail")
@@ -56,7 +56,7 @@ public class UserController {
         if (email == null) {
             mav.addObject("msg", "이메일을 입력 후 시도해주세요");
             mav.addObject("isCheck", 0);
-            mav.setViewName("user/popUp/idCheck");
+            mav.setViewName("th/user/popUp/idCheck");
             return mav;
         }
         int result = memberMapper.CheckEmail(email);
@@ -67,7 +67,7 @@ public class UserController {
             mav.addObject("msg", email + "는 이미 사용중인 이메일입니다.");
             mav.addObject("isCheck", 0);
         }
-        mav.setViewName("user/popUp/emailCheck");
+        mav.setViewName("th/user/popUp/emailCheck");
         return mav;
     }
 
@@ -80,17 +80,17 @@ public class UserController {
 
     @GetMapping("/signup")
     private String signup() {
-        return "/user/sign-up";
+        return "th/user/sign-up";
     }
 
     @GetMapping("/signup/info")
     private String inputInfo() {
-        return "/user/sign-up-info";
+        return "th/user/sign-up-info";
     }
 
     @GetMapping("/signup/end")
     private String signupEnd() {
-        return "/user/sign-up-end";
+        return "th/user/sign-up-end";
     }
 
     @GetMapping("/user/address")
@@ -117,7 +117,7 @@ public class UserController {
         List<OrderVO> orderVOList = memberMapper.getOrderList(userid);
         System.out.println(orderVOList);
         model.addAttribute(orderVOList);
-        return "/user/myPageHome";
+        return "th/user/myPageHome";
     }
 
     @GetMapping("/mypage/order")
@@ -141,12 +141,12 @@ public class UserController {
             model.addAttribute("bank", bank);
             model.addAttribute("account", account);
         }
-        return "/user/myPage-orderDetail";
+        return "th/user/myPage-orderDetail";
     }
 
     @GetMapping("/mypage/delete")
     private String deleteAccount(){
-        return "user/DeleteAccount";
+        return "th/user/DeleteAccount";
     }
 
     @GetMapping("/byebye")
@@ -168,7 +168,7 @@ public class UserController {
         Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
         MemberVO memberVO = memberMapper.getUserInfo(userid);
         if(!memberVO.getProvider().equals("none") && memberVO.getPassword()==null){
-            return "/user/set-password";
+            return "th/user/set-password";
         }
         System.out.println(memberVO);
         model.addAttribute("mvo",memberVO);
@@ -190,7 +190,7 @@ public class UserController {
 
         //수정가능범위
         //이름, 비번, 휴대폰번호, 주소, 어느아이디인지 띄워주기
-        return "/user/myPage-Edit";
+        return "th/user/myPage-Edit";
     }
 
     @PostMapping("/mypage/checkpwd")
@@ -236,5 +236,13 @@ public class UserController {
             SecurityContextHolder.getContext().setAuthentication(newAuth);
         }
         return result;
+    }
+
+    @PostMapping("mypage/order/cancle")
+    @ResponseBody
+    private int cancleOrder(String orderNum){
+        OrderVO orderVO = memberMapper.getOrderDetailWithOrderNum(orderNum);
+        int change = orderVO.getStatus()==0?-2:-1;
+        return memberMapper.cancleOrder(orderNum, change);
     }
 }

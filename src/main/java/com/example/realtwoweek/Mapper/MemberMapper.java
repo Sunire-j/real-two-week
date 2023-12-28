@@ -34,5 +34,9 @@ public interface MemberMapper {
 
     int changeInfo(MemberVO mvo);
 
+    OrderVO getOrderDetailWithOrderNum(String ordernum);
+
+    int cancleOrder(String orderNum, int status);
+
 
 }

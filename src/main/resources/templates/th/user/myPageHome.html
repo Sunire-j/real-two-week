@@ -3,7 +3,9 @@
 <head>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <style>
-
+        p{
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -35,6 +37,8 @@
                     <p th:case="1">결제완료</p>
                     <p th:case="2">배송시작</p>
                     <p th:case="3">배송완료</p>
+                    <p th:case="-1">취소신청</p>
+                    <p th:case="-2">취소완료</p>
                 </td>
             </tr>
             </tbody>

@@ -89,7 +89,6 @@
 
     <div class="title-div d-flex">
         <h3 class="title">신상품</h3>
-        <a class="plus-button" href="#" style="color: black"><i class="fa-solid fa-plus"></i></a>
     </div>
 
     <div class="item-amount">
@@ -109,13 +108,12 @@
     <!--    추천상품-->
     <!-- 추천의 기준?.... 잘 팔리는거?... 일단 최신순-->
     <div class="title-div d-flex">
-        <h3 class="title">추천상품</h3>
-        <a class="plus-button" href="#" style="color: black"><i class="fa-solid fa-plus"></i></a>
+        <h3 class="title">인기상품</h3>
     </div>
     <div class="item-amount">
         <div style="font-weight: bold; text-align: center; width: 100%" th:if="${newitems.size()==0}">추천상품이 없습니다.</div>
         <!--        each-items를 foreach로 뽑아주면 됨-->
-        <div class="each-items"  th:each="items : ${newitems}">
+        <div class="each-items"  th:each="items : ${recommend}">
             <div class="items-img"  th:onclick="|location.href='/goods/view?no=${items.items_id}'|">
                 <!--                여기에 db에 저장한 이미지주소 들어감-->
                 <img th:src="${items.img}">

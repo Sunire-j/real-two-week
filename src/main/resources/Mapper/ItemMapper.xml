@@ -6,14 +6,27 @@
         select *
         from items
         order by date desc
-            limit 4;
+        limit 4;
     </select>
 
     <select id="getRecommendItems" resultType="com.example.realtwoweek.vo.ItemVO">
-        select *
-        from items
-        order by date desc
-            limit 4;
+        SELECT
+            i.img AS img,
+            i.name AS name,
+            i.price as price,
+            i.items_id as items_id,
+            SUM(CASE WHEN o.status = 3 THEN od.amount ELSE 0 END) AS sold_count
+        FROM
+            items AS i
+                LEFT JOIN
+            orderdetail AS od ON i.items_id = od.items_items_id
+                LEFT JOIN
+            `order` AS o ON od.order_idorder = o.idorder
+        GROUP BY
+            i.items_id
+        ORDER BY
+            sold_count DESC
+        LIMIT 4;
     </select>
 
     <select id="getItemDetail" resultType="com.example.realtwoweek.vo.ItemVO">
@@ -23,7 +36,16 @@
     </select>
 
     <select id="getGoodsList" resultType="com.example.realtwoweek.vo.ItemVO">
-        select * from items where category=#{param1};
+        select *
+        from items
+        where category = #{param1};
+    </select>
+
+    <select id="getGoodsListPaging" resultType="com.example.realtwoweek.vo.ItemVO">
+        select *
+        from items
+        where category = #{category}
+        limit #{onePageRecord} offset #{offsetPoint};
     </select>
 
     <select id="getAllItems" resultType="com.example.realtwoweek.vo.ItemVO">

@@ -65,6 +65,7 @@
                 <p th:case="1">결제완료</p>
                 <p th:case="2">배송시작</p>
                 <p th:case="3">배송완료</p>
+                <p th:case="-1">취소신청</p>
             </td>
             <td th:text="${#numbers.formatInteger(orderList.totalprice, 3, 'COMMA')+'원'}"></td>
             <td th:text="${#numbers.formatInteger(orderList.delivery,3,'COMMA')+'원'}"></td>
@@ -75,6 +76,7 @@
                 <button class="btn btn-sm btn-primary next" th:case="0">입금확인처리</button>
                 <button class="btn btn-sm btn-primary next" th:case="1">배송시작처리</button>
                 <button class="btn btn-sm btn-primary next" th:case="2">배송완료처리</button>
+                <button class="btn btn-sm btn-primary prev" th:case="-1">취소완료처리</button>
                 <input type="hidden" th:value="${orderList.orderNum}">
             </td>
         </tr>
@@ -128,6 +130,25 @@
                 location.reload();
             });
         })
+
+        $('.table').on('click','.prev',function(){
+            if(!confirm("정말 "+$(this).text()+" 하시겠습니까?")){
+                return false;
+            }
+            var orderNum = $(this).next('input').val();
+            data={
+                orderNum:orderNum
+            };
+            var url = '/admin/order/prevStep';
+            $.post(url, data,function(result){
+                if(result<1){
+                    alert("알 수 없는 오류발생");
+                }
+                location.reload();
+            });
+        })
+
+
     })
 </script>
 <footer style="background: #ddd; text-align: center">

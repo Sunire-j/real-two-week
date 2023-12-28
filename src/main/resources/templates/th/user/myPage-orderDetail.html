@@ -26,11 +26,23 @@
 <body>
 <div th:replace="fragments/header::header"></div>
 <div class="container">
-    <div>
-        <h2 style="font-weight: bold">주문완료</h2>
+    <div class="button-container d-flex"
+         style="width: 600px; justify-content: space-between; margin: 0 auto; margin-top: 100px">
+        <input type="button" class="btn btn-primary" onclick="location.href='/mypage'" value="주문 내역">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/mypage/edit'" value="정보 수정">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/mypage/delete'" value="회원 탈퇴">
+    </div>
+    <div th:switch="${ovo.status}">
+        <h2 style="font-weight: bold; margin-top: 30px;">주문확인</h2>
         <hr/>
-        <img src="https://malldemo01.swm.whoismall.com/skin/f_simple/images/shop/order_step03_topimg.gif">
-        <div style="width: 100%; text-align: center"><img  src="https://malldemo01.swm.whoismall.com/skin/f_simple/images/shop/order_step3_okimg.gif"></div>
+    </div>
+    <div style="margin: 0 auto; text-align: center" th:switch="${ovo.status}">
+        <h3 style="color: #f87502; font-weight: bold" th:case="0">결제대기</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="1">결제완료</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="2">배송시작</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="3">배송완료</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="-1">취소신청</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="-2">취소완료</h3>
     </div>
     <h5 style="font-weight: bold">주문자 정보</h5>
     <div class="order-container">
@@ -127,11 +139,27 @@
         </div>
     </div>
 
-    <div class="button-container d-flex" style="justify-content: space-between; width: 300px; margin: 0 auto; margin-top: 30px">
-        <a href="#" class="btn btn-warning">구매내역 보기</a>
-        <a href="/" class="btn btn-secondary">쇼핑 계속하기</a>
+    <div style="width: fit-content; margin: 0 auto; margin-top: 30px" th:if="${ovo.status==0 || ovo.status==1}">
+        <button class="btn btn-danger cancle">취소신청</button>
+        <input type="hidden" th:value="${ovo.orderNum}">
     </div>
 
+    <script>
+        $(function(){
+            $('.cancle').on('click',function(){
+                var orderNum = $(this).next('input').val();
+                if(!confirm("정말 취소신청하시겠습니까?")){
+                    return false;
+                }
+                $.post("/mypage/order/cancle", {orderNum:orderNum}, function(result){
+                    if(result<1){
+                        alert("알 수 없는 오류 발생");
+                    }
+                    location.reload();
+                })
+            })
+        })
+    </script>
 </div>
 <div th:replace="fragments/footer::footer"></div>
 </body>

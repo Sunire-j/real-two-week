@@ -81,6 +81,30 @@
     </div>
 <!--    -->
 
+    <div class="pagination-container d-flex" style="margin: 0 auto; margin-top: 20px; width: fit-content">
+        <div class="pagination" style="display: flex">
+            <div class="paging d-flex">
+                <div th:if="${pVO.page > 1}">
+                    <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${pVO.page - 1}&category=${pVO.category}'|" ><</button>
+                </div>
+                <div th:each="i : ${#numbers.sequence(pVO.startPage, pVO.startPage + pVO.onePageCount - 1)}"
+                     th:if="${i <= pVO.totalPage}">
+                    <div th:if="${i != pVO.page}">
+                        <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${i}&category=${pVO.category}'|">[[${i}]]
+                        </button>
+                    </div>
+                    <div th:unless="${i != pVO.page}">
+                        <strong class="btn btn-outline-secondary" style="font-weight: bold">[[${i}]]</strong>
+                    </div>
+                </div>
+                <div th:if="${pVO.page < pVO.totalPage}">
+                    <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${pVO.page + 1}&category=${pVO.category}'|">>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 <!---->
 </div>

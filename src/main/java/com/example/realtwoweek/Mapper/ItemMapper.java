@@ -21,4 +21,8 @@ public interface ItemMapper {
 
     List<ItemVO> getAllItemsPaging(PagingVO pvo);
 
+    List<ItemVO> getGoodsListPaging(PagingVO pvo);
+
+    String getOrderNum(int orderid);
+
 }

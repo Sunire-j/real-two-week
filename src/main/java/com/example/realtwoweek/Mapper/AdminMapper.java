@@ -42,4 +42,6 @@ public interface AdminMapper {
 
     int deleteMember(Long uid);
 
+    int cancleOrder(String ordernum);
+
 }

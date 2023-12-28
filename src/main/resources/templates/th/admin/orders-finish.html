@@ -64,6 +64,7 @@
                 <p th:case="1">결제완료</p>
                 <p th:case="2">배송시작</p>
                 <p th:case="3">배송완료</p>
+                <p th:case="-2">취소완료</p>
             </td>
             <td th:text="${#numbers.formatInteger(orderList.totalprice, 3, 'COMMA')+'원'}"></td>
             <td th:text="${#numbers.formatInteger(orderList.delivery,3,'COMMA')+'원'}"></td>

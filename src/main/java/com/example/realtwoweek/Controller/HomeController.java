@@ -1,5 +1,6 @@
 package com.example.realtwoweek.Controller;
 
+import com.example.realtwoweek.Mapper.AdminMapper;
 import com.example.realtwoweek.Mapper.ItemMapper;
 import com.example.realtwoweek.domain.Member;
 import com.example.realtwoweek.repository.MemberRepository;
@@ -10,6 +11,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
@@ -32,11 +34,18 @@ public class HomeController{
         List<ItemVO> Newlist = itemMapper.getNewItems();
         List<ItemVO> RecommendList = itemMapper.getRecommendItems();
         model.addAttribute("newitems", Newlist);
-        return "index";
+        model.addAttribute("recommend",RecommendList);
+
+        return "th/index";
     }
 
     @GetMapping("/error")
     public String errorPage(){
         return "error";
+    }
+
+    @PostMapping("/order/getOrderNum")
+    public String getOrderNum(int orderid){
+        return itemMapper.getOrderNum(orderid);
     }
 }

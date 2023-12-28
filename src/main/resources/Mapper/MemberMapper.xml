@@ -87,4 +87,16 @@
         where member_id=#{member_id}
     </update>
 
+    <select id="getOrderDetailWithOrderNum" resultType="com.example.realtwoweek.vo.OrderVO">
+        select *
+        from `order`
+        where orderNum=#{param1};
+    </select>
+
+    <update id="cancleOrder">
+        update `order`
+        set status=#{param2}
+        where orderNum=#{param1}
+    </update>
+
 </mapper>

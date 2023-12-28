@@ -15,6 +15,7 @@ public class PagingVO {
     private int totalPage;
     private int offsetPoint = (page - 1) * onePageRecord;
     private int startPage = 1;
+    private int category;
 
 
     public void setPage(int page) {
