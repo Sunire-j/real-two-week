@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/f5234bf2d4.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/header.css}" rel="stylesheet">
+    <style>
+        .button-container{
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+        td>img{
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+</head>
+<body>
+<header style="background: #f87502; text-align: center;">
+    <h1>관리자페이지</h1>
+</header>
+<div class="container">
+    <div class="button-container d-flex">
+        <input type="button" onclick="location.href='/admin/home'" class="btn btn-outline-primary" value="홈">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/items'" value="상품관리">
+        <input type="button" class="btn btn-primary" onclick="location.href='/admin/order/waiting'" value="주문관리">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/payment'" value="결제수단관리">
+        <input type="button" class="btn btn-outline-primary" onclick="location.href='/admin/user'" value="회원관리">
+    </div>
+
+    <div class="button-container d-flex" style="width: 300px; margin: 0 auto; margin-top: 30px">
+        <input type="button" onclick="location.href='/admin/order/waiting'" class="btn btn-secondary" value="미완료">
+        <input type="button" class="btn btn-outline-secondary" onclick="location.href='/admin/order/complete'" value="완료">
+    </div>
+
+    <h1 style="margin-top: 30px">주문관리</h1>
+
+    <table class="table table-hover" style="margin-top: 50px">
+        <thead>
+        <tr>
+            <th>주문번호</th>
+            <th>구매자</th>
+            <th>진행상태</th>
+            <th>금액</th>
+            <th>배송비</th>
+            <th>합계금액</th>
+            <th>날짜</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="orderList : ${list}">
+            <td ><a style="color: #f87502; font-weight: bold" th:text="${orderList.orderNum}" th:href="|/admin/order/detail?no=${orderList.orderNum}|"></a></td>
+            <td th:text="${orderList.member_id}"></td>
+            <td th:switch="${orderList.status}">
+                <p th:case="0">결제대기</p>
+                <p th:case="1">결제완료</p>
+                <p th:case="2">배송시작</p>
+                <p th:case="3">배송완료</p>
+            </td>
+            <td th:text="${#numbers.formatInteger(orderList.totalprice, 3, 'COMMA')+'원'}"></td>
+            <td th:text="${#numbers.formatInteger(orderList.delivery,3,'COMMA')+'원'}"></td>
+            <td th:text="${#numbers.formatInteger(orderList.totalprice+orderList.delivery,3,'COMMA')+'원'}"></td>
+            <td th:text="${orderList.date}"></td>
+
+            <td th:switch="${orderList.status}">
+                <button class="btn btn-sm btn-primary next" th:case="0">입금확인처리</button>
+                <button class="btn btn-sm btn-primary next" th:case="1">배송시작처리</button>
+                <button class="btn btn-sm btn-primary next" th:case="2">배송완료처리</button>
+                <input type="hidden" th:value="${orderList.orderNum}">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+<!--    아마 여기 아래에 페이징?-->
+
+    <div class="pagination-container d-flex" style="margin: 0 auto; margin-top: 20px; width: fit-content">
+        <div class="pagination" style="display: flex">
+            <div class="paging d-flex">
+                <div th:if="${pVO.page > 1}">
+                    <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${pVO.page - 1}'|"><
+                    </button>
+                </div>
+                <div th:each="i : ${#numbers.sequence(pVO.startPage, pVO.startPage + pVO.onePageCount - 1)}"
+                     th:if="${i <= pVO.totalPage}">
+                    <div th:if="${i != pVO.page}">
+                        <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${i}'|">[[${i}]]
+                        </button>
+                    </div>
+                    <div th:unless="${i != pVO.page}">
+                        <strong class="btn btn-outline-secondary" style="font-weight: bold">[[${i}]]</strong>
+                    </div>
+                </div>
+                <div th:if="${pVO.page < pVO.totalPage}">
+                    <button class="btn btn-outline-secondary" th:onclick="|location.href='?page=${pVO.page + 1}'|">>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(function(){
+        $('.table').on('click','.next',function(){
+            if(!confirm("정말 "+$(this).text()+" 하시겠습니까?")){
+                return false;
+            }
+            var orderNum = $(this).next('input').val();
+            data={
+                orderNum:orderNum
+            };
+            var url = '/admin/order/nextStep';
+            $.post(url, data,function(result){
+                if(result<1){
+                    alert("알 수 없는 오류발생");
+                }
+                location.reload();
+            });
+        })
+    })
+</script>
+<footer style="background: #ddd; text-align: center">
+    <h1>푸터푸터</h1>
+</footer>
+</body>
+</html>

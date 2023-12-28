@@ -1,7 +1,9 @@
 package com.example.realtwoweek.Controller;
 
 import com.example.realtwoweek.Mapper.AdminMapper;
+import com.example.realtwoweek.Mapper.BasketMapper;
 import com.example.realtwoweek.Mapper.ItemMapper;
+import com.example.realtwoweek.vo.BasketVO;
 import com.example.realtwoweek.vo.ItemVO;
 import com.example.realtwoweek.vo.OrderVO;
 import com.example.realtwoweek.vo.PagingVO;
@@ -24,10 +26,12 @@ public class AdminController {
 
     private final ItemMapper itemMapper;
     private final AdminMapper adminMapper;
+    private final BasketMapper basketMapper;
 
-    public AdminController(ItemMapper itemMapper, AdminMapper adminMapper) {
+    public AdminController(ItemMapper itemMapper, AdminMapper adminMapper, BasketMapper basketMapper) {
         this.itemMapper = itemMapper;
         this.adminMapper = adminMapper;
+        this.basketMapper = basketMapper;
     }
 
 
@@ -173,8 +177,46 @@ public class AdminController {
         model.addAttribute("pVO", pvo);
         List<OrderVO> list = adminMapper.getOrderList(pvo);
         model.addAttribute("list", list);
-        return "/admin/orders";
+        return "admin/orders-waiting";
     }
+
+    @PostMapping("/order/nextStep")
+    @ResponseBody
+    private int orderNextStep(String orderNum){
+        int result = adminMapper.orderNextStep(orderNum);
+        return result;
+    }
+
+    @GetMapping("/order/detail")
+    private String orderDetail(String no, Model model){
+        OrderVO ovo = adminMapper.getOrderDetail(no);
+        System.out.println(ovo.toString());
+        model.addAttribute("ovo",ovo);
+        List<BasketVO> items = basketMapper.getOrderItemList(ovo.getIdorder());
+        model.addAttribute("blist",items);
+        String method = basketMapper.getMethodName(ovo.getMethod());
+        model.addAttribute("method", method);
+        if(ovo.getMethod()==1){
+            String methodDetail = basketMapper.getMethodDetailName(ovo.getMethodDetails());
+            String bank = methodDetail.substring(0, methodDetail.indexOf("("));
+            String account = methodDetail.substring(methodDetail.indexOf("(")+1, methodDetail.indexOf(")"));
+            model.addAttribute("bank", bank);
+            model.addAttribute("account", account);
+        }
+        return "admin/order-detail";
+    }
+
+    @GetMapping("/order/complete")
+    private String orderListComplete(PagingVO pvo, Model model){
+        int total = adminMapper.getOrderCompleteTotalRecord();
+        pvo.setTotalRecord(total);
+        model.addAttribute("pVO", pvo);
+        List<OrderVO> list = adminMapper.getOrderListComplete(pvo);
+        model.addAttribute("list", list);
+        return "admin/orders-finish";
+    }
+
+
 
 
 }

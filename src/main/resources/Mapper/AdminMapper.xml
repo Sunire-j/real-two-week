@@ -23,12 +23,40 @@
 
     <select id="getOrderTotalRecord" resultType="Integer">
         select count(idorder)
-        from `order`;
+        from `order`
+        where status!=3
     </select>
 
     <select id="getOrderList" resultType="com.example.realtwoweek.vo.OrderVO">
         select *
         from `order`
+        where status!=3
+        order by date desc
+        limit #{onePageRecord} offset #{offsetPoint};
+    </select>
+
+    <update id="orderNextStep">
+        update `order`
+        set status=status+1
+        where orderNum=#{param1};
+    </update>
+
+    <select id="getOrderDetail" resultType="com.example.realtwoweek.vo.OrderVO">
+        select *
+        from `order`
+        where orderNum=#{param1}
+    </select>
+
+    <select id="getOrderCompleteTotalRecord" resultType="Integer">
+        select count(idorder)
+        from `order`
+        where status=3;
+</select>
+
+    <select id="getOrderListComplete" resultType="com.example.realtwoweek.vo.OrderVO">
+        select *
+        from `order`
+        where status=3
         order by date desc
         limit #{onePageRecord} offset #{offsetPoint};
     </select>
