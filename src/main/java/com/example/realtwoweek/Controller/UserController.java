@@ -167,18 +167,13 @@ public class UserController {
         UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
         Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
         MemberVO memberVO = memberMapper.getUserInfo(userid);
-        if(!memberVO.getProvider().equals("none") && memberVO.getPassword()==null){
-            return "th/user/set-password";
-        }
-        System.out.println(memberVO);
+
         model.addAttribute("mvo",memberVO);
         String phone1="none";
         String phone2="";
         String phone3="";
 
-        System.out.println("폰번호 이거임 : "+memberVO.getPhone());
-        if(memberVO.getPhone()==null || !memberVO.getPhone().equals("")){
-            System.out.println("여기들어옴");
+        if(memberVO.getPhone()!=null){
             phone1 = memberVO.getPhone().substring(0,3);
             phone2 = memberVO.getPhone().substring(3,7);
             phone3 = memberVO.getPhone().substring(7);
@@ -186,6 +181,11 @@ public class UserController {
         model.addAttribute("phone1", phone1);
         model.addAttribute("phone2", phone2);
         model.addAttribute("phone3", phone3);
+
+
+        if(!memberVO.getProvider().equals("none") && memberVO.getPassword()==null){
+            return "th/user/myPage-Edit-Social";
+        }
 
 
         //수정가능범위
@@ -245,4 +245,14 @@ public class UserController {
         int change = orderVO.getStatus()==0?-2:-1;
         return memberMapper.cancleOrder(orderNum, change);
     }
+
+    @PostMapping("/mypage/social/edit")
+    @ResponseBody
+    private int infoEditSocial(Authentication auth, MemberVO mvo){
+        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
+        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        mvo.setMember_id(userid);
+        return memberMapper.editInfoSocial(mvo);
+    }
+
 }

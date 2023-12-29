@@ -38,5 +38,7 @@ public interface MemberMapper {
 
     int cancleOrder(String orderNum, int status);
 
+    int editInfoSocial(MemberVO mvo);
+
 
 }

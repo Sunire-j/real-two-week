@@ -4,16 +4,11 @@ import com.example.realtwoweek.config.auth.OAuthService;
 import com.example.realtwoweek.service.DelegatingUserDetailsService;
 import com.example.realtwoweek.service.MemberService;
 import com.example.realtwoweek.service.NormalMemberService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -40,12 +35,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors().and()
+                .cors().disable()
                 .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/**").permitAll()
-                .antMatchers("/order/confirm").permitAll()
-                .and()
                 .headers().frameOptions().disable()
                 .and()
                 .logout().logoutSuccessUrl("/")
@@ -57,7 +48,7 @@ public class SecurityConfig {
                 .and()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/signin", "/signup/**", "/signup", "/LoginOk", "/goods/view").permitAll()
+                .antMatchers("/", "/signin", "/signup/**", "/signup", "/LoginOk", "/goods/view","/**","/purchase/confirm").permitAll()
                 .antMatchers("/loginInfo", "/basket/**", "/mypage").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
@@ -66,10 +57,9 @@ public class SecurityConfig {
                 .loginPage("/signin")
                 .loginProcessingUrl("/LoginOk")
                 .usernameParameter("userid")
-                .passwordParameter("userpwd")// 로그인 처리 URL
-                .defaultSuccessUrl("/")  // 로그인 성공 후 리다이렉트 URL
-                .and()
-                .headers().frameOptions().sameOrigin();
+                .passwordParameter("userpwd")
+                .defaultSuccessUrl("/")
+                .and();
 
         return http.build();
     }

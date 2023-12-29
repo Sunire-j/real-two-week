@@ -1,18 +1,25 @@
 package com.example.realtwoweek.Controller;
 
-import com.example.realtwoweek.vo.PurchaseReturnParam;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+
 public class PurchaseController {
 
-    @PostMapping("/order/confirm")
+    @PostMapping("/purchase/confirm")
+    @ResponseBody
     public String returnURL(){
-        System.out.println("들어옴");
-        return "PayReturn";
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
+        return "th/index";
     }
 
+    @GetMapping("/test")
+    public String testtest(){
+        return "PayReturn";
+    }
 }

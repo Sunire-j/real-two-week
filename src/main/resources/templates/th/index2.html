@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+</head>
+<body>
+<div th:replace="fragments/header::header"></div>
+<div class="container">
+
+    <form method="post" action="/purchase/confirm">
+        <input type="submit" class="btn btn-primary">
+    </form>
+</div>
+<div th:replace="fragments/footer::footer"></div>
+</body>
+</html>

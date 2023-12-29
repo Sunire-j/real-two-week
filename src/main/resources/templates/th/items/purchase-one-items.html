@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <meta name="referrer" content="no-referrer-when-downgrade"/>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <script src="https://pay.billgate.net/paygate/plugin/gx_web_client.js"></script>
@@ -250,32 +250,36 @@
 
                         if (result > 0) {
                             var orderid = result;
-                            var orderNum = null;
-                            $.post("/order/getOrderNum",{orderid:orderid}, function(result){
-                                orderNum=result;
+                            var orderNum;
+                            var checksum;
+                            $.post("/order/getOrderNum", {orderid: orderid}, function (result) {
+                                orderNum = result;
+                                //오더아이디 폼에 넣어줌
+
+                                $("#USER_EMAIL").val(email);
+                                $("#ORDER_ID").val("SHOPTEMPJSH" + orderNum);
+                                $("#CHECK_SUM").val(result);
+                                if ($("input[name='method']:checked").val() == 2) {
+                                    GX_pay("TEMP_FORM", "popup", "https_tpay");
+                                }
+
+                                // $.ajax({
+                                //     url:'/goods/addItemToOrder',
+                                //     type:'post',
+                                //     data:{
+                                //         orderid : orderid,
+                                //         items_id : [[${ivo.items_id}]],
+                                //         amount:[[${amount}]]
+                                //     },
+                                //     success:function(result){
+                                //         location.href="/basket/complete?orderid="+orderid;
+                                //     },
+                                //     error:function(error){
+                                //         console.log(error.responseText);
+                                //     }
+                                // });
                             })
-                            //오더아이디 폼에 넣어줌
-                            $("#ORDER_ID").val("SHOPTEMPJSH"+orderNum);
-                            console.log($("#ORDER_ID").val());
-                            $("#RETURN_URL").val("https://localhost:9999/order/confirm");
-                            if ($("input[name='method']:checked").val() == 2) {
-                                GX_pay("TEMP_FORM", "layerpopup", "https_tpay");
-                            }
-                            // $.ajax({
-                            //     url:'/goods/addItemToOrder',
-                            //     type:'post',
-                            //     data:{
-                            //         orderid : orderid,
-                            //         items_id : [[${ivo.items_id}]],
-                            //         amount:[[${amount}]]
-                            //     },
-                            //     success:function(result){
-                            //         location.href="/basket/complete?orderid="+orderid;
-                            //     },
-                            //     error:function(error){
-                            //         console.log(error.responseText);
-                            //     }
-                            // });
+
                         }
 
                     },
@@ -356,8 +360,8 @@
                     <div>이메일</div>
                 </div>
                 <div class="right">
-                    <div><input th:value="${username}" readonly type="text" style="width: 200px" id="order-name"
-                                class="form-control form-control-sm" name="order-username"></div>
+                    <div><input th:value="${username}"  readonly type="text" style="width: 200px" id="order-name"
+                                class="form-control form-control-sm" name="USER_NAME"></div>
                     <div class="d-flex">
                         <select class="form-select form-select-sm" name="tel1" style="width: 100px">
                             <option value="none" th:selected="${phone1=='none'}">선택</option>
@@ -504,11 +508,15 @@
                    class="btn btn-primary">
             <input type="hidden" name="SERVICE_CODE" value="0900"/>
             <input type="hidden" name="ITEM_NAME" id="ITEM_NAME" th:value="${ivo.name}"/>
-            <input type="hidden" name="SERVICE_ID" value="M2103135"/>
+            <input type="hidden" name="SERVICE_ID" id="SERVICE_ID" value="M2103135"/>
             <input type="hidden" name="ORDER_ID" id="ORDER_ID" value=""/>
             <input type="hidden" name="ORDER_DATE" id="ORDER_DATE"/>
-            <input type="hidden" name="AMOUNT" th:value="${sumPrice+maxDelivery}"/>
-            <input type="hidden" name="RETURN_URL" id="RETURN_URL" value=""/>
+            <input type="hidden" name="AMOUNT" id="AMOUNT" th:value="${sumPrice+maxDelivery}"/>
+            <input type="hidden" name="RETURN_URL" id="RETURN_URL" value="http://localhost:9999/purchase/confirm"/>
+            <input type="hidden" name="USER_ID" th:value="${userid}"/>
+            <input type="hidden" name="USER_EMAIL" id="USER_EMAIL"/>
+            <input type="hidden" name="SERVICE_TYPE" value="0000"/>
+
         </div>
     </form>
 </div>

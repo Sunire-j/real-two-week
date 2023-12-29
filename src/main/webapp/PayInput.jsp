@@ -57,7 +57,7 @@
 	String userEmail		="test@test.com";		
 	String orderDate		= year+month+date+hour+minute+second ;
 	String orderId			="test_"+orderDate;
-	String returnUrl			="https://localhost:9999/order/confirm";  // *가맹점 수정 필수
+	String returnUrl			="http://127.0.0.1/BillgatePay-JSP/PayReturn.jsp";  // *가맹점 수정 필수 
 	String checkSum		="";
 	String cancelFlag		="Y";
 	String reserved1		="예비변수1";

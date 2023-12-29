@@ -265,6 +265,8 @@ public class BasketController {
         model.addAttribute("sumPrice",ivo.getPrice()*amount);
         model.addAttribute("ivo", ivo);
 
+        model.addAttribute("userid", userid);
+
         String phone1="";
         String phone2="";
         String phone3="";

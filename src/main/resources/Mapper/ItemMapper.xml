@@ -59,4 +59,10 @@
         order by date desc
         limit #{onePageRecord} offset #{offsetPoint};
     </select>
+
+    <select id="getOrderNum" resultType="String">
+        select orderNum
+        from `order`
+        where idorder=#{param1};
+    </select>
 </mapper>

@@ -99,4 +99,11 @@
         where orderNum=#{param1}
     </update>
 
+    <update id="editInfoSocial" parameterType="com.example.realtwoweek.vo.MemberVO">
+        update member
+        set zipno=#{zipno}, address1=#{address1}, address2=#{address2},
+            address3=#{address3}, phone=#{phone}
+        where member_id=#{member_id}
+    </update>
+
 </mapper>
