@@ -16,26 +16,9 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // 모든 경로에 대해서
-                .allowedOrigins("*") // 모든 출처
-                .allowedMethods("*"); // 모든 HTTP 메소드 허용
+        registry.addMapping("/**")
+                .allowedOrigins("*");  // '*' 대신 특정 도메인을 넣을 수 있음.
     }
-
-    @Bean
-    public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(false);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        config.setMaxAge(6000L);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean<CorsFilter> filterBean = new FilterRegistrationBean<>(new CorsFilter());
-        filterBean.setOrder(0);
-        return filterBean;
-    }
-
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

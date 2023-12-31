@@ -10,7 +10,7 @@
 	// static 변수 및 함수 선언부
 	//================================
 	public static final String VERSION ="0100";
-	public static final String CONF_PATH ="D:/Dev/Workspace/BillgatePay-JSP/WEB-INF/classes/config.ini"; //*가맹점 수정 필수
+	public static final String CONF_PATH ="E:/real-two-week/src/main/webapp/WEB-INF/classes/config.ini"; //*가맹점 수정 필수
 	
 	// 승인 요청
 		public Message MessageAuthProcess(Map<String,String> authInfo) throws Exception {
