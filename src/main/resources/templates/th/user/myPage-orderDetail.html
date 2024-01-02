@@ -106,7 +106,7 @@
                     <div th:text="|결제 예정금액 : ${#numbers.formatInteger(ovo.totalprice+ovo.delivery,3,'COMMA')+'원'}|"></div>
                 </div>
                 <span th:case="2">
-                    <div th:text="|결제 카드 정보 : 1111-2222-****-4444|"></div>
+                    <div th:text="|승인번호 : ${ovo.cardNum}|"></div>
                     <div th:text="|승인일자 : ${ovo.date}|"></div>
                     <div th:text="|승인금액 : ${#numbers.formatInteger(ovo.totalprice+ovo.delivery,3,'COMMA')+'원'}|"></div>
                 </span>

@@ -10,7 +10,7 @@
 	// static 변수 및 함수 선언부
 	//================================
 	public static final String VERSION ="0100";
-	public static final String CONF_PATH ="E:/real-two-week/src/main/webapp/WEB-INF/classes/config.ini"; //*가맹점 수정 필수
+	public static final String CONF_PATH ="C:/project/real-two-week/src/main/webapp/WEB-INF/classes/config.ini"; //*가맹점 수정 필수
 	
 	// 승인 요청
 		public Message MessageAuthProcess(Map<String,String> authInfo) throws Exception {
@@ -153,206 +153,48 @@
 		//================================================
 		// 2. 인증 성공일 경우에만 승인 요청 진행
 		//================================================
-		if(("0000").equals(responseCode)&&!("1800".equals(serviceCode))){ //가상계좌 제외
-			
-		//결제 정보 Map에 저장
-		authInfo = new HashMap<String,String>();
+		if(("0000").equals(responseCode)&&!("1800".equals(serviceCode))) { //가상계좌 제외
 
-		authInfo.put("serviceId", serviceId);
-		authInfo.put("serviceCode", serviceCode);
-		authInfo.put("message", message);
+			//결제 정보 Map에 저장
+			authInfo = new HashMap<String, String>();
 
-		//================================
-		// 4. 승인 요청 & 승인 응답 결과 설정  
-		//================================				
-		//승인 요청(Message)
-		respMsg = MessageAuthProcess(authInfo);
+			authInfo.put("serviceId", serviceId);
+			authInfo.put("serviceCode", serviceCode);
+			authInfo.put("message", message);
+			System.out.println(serviceId);
+			System.out.println(serviceCode);
+			System.out.println(message);
 
-		//결제 수단 별 승인 응답 분리
-		//휴대폰
-		if("1100".equals(serviceCode)){ 			
-
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");			//거래번호
-			authDate = respMsg.get("1005");					//승인일시
-			authAmount = respMsg.get("1007");				//승인금액
-			partCancelType =respMsg.get("7049");			//부분 취소 타입
-
-		//신용카드	
-		}else if("0900".equals(serviceCode)){		
-	
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");				//거래번호
-			authNumber = respMsg.get("1004");					//승인번호	
-			authDate = respMsg.get("1005");						//승인일시
-			authAmount = respMsg.get("1007");					//승인금액
-			quota = respMsg.get("0031");								//할부개월 수
-			cardCompanyCode = respMsg.get("0034");			//카드발급사 코드
-
-		
-		//계좌이체
-		}else if("1000".equals(serviceCode)){		
-		
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");			//거래번호
-			authAmount = respMsg.get("1007");				//승인금액
-			authDate = respMsg.get("1005");					//승인일시
-			usingType = respMsg.get("0015");					//현금영수증 용도
-			identifier = respMsg.get("0017");					//현금영수증 승인번호
-			identifierType = respMsg.get("0102");				//현금영수증 자진발급제유무
-			mixType = respMsg.get("0037");						//거래구분
-			inputBankCode = respMsg.get("0105");			//은행 코드
-			inputAccountName = respMsg.get("0107");		//은행 명
-		
-		//도서문화상품권	
-		}else if("0100".equals(serviceCode)){
-		
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");			//거래번호
-			authDate = respMsg.get("1005");					//승인일시	
-			authNumber = respMsg.get("1004");				//승인번호	
-			authAmount = respMsg.get("1007");				//승인금액		
-	
-		//문화상품권
-		}else if("0200".equals(serviceCode)){
-		
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			authDate = respMsg.get("1005");				//승인일시	
-			authNumber = respMsg.get("1004");			//승인번호	
-			authAmount = respMsg.get("1007");			//승인금액
-		
-		//게임문화상품권
-		}else if("0300".equals(serviceCode)){
-			
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			authDate = respMsg.get("1005");				//승인일시	
-			authNumber = respMsg.get("1004");			//승인번호	
-			authAmount = respMsg.get("1007");			//승인금액
-		
-		//해피머니상품권
-		}else if("0500".equals(serviceCode)){
-			
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			authDate = respMsg.get("1005");				//승인일시	
-			authNumber = respMsg.get("1004");			//승인번호	
-			authAmount = respMsg.get("1007");			//승인금액
-		
-		//캐시게이트	
-		}else if("0700".equals(serviceCode)){		
+			//================================
+			// 4. 승인 요청 & 승인 응답 결과 설정
+			//================================
+			//승인 요청(Message)
+			respMsg = MessageAuthProcess(authInfo);
+			System.out.println(respMsg.toString());
 
 			//승인 응답
 			outResponseCode = respMsg.get("1002");
 			outResponseMessage = respMsg.get("1003");
 			outDetailResponseCode = respMsg.get("1009");
 			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			balance = respMsg.get("1006");					//결제 후 잔액
-			dealAmount = respMsg.get("0012");			//승인금액(타 결제수단과  tag값이 다르므로 주의)
-			authDate = respMsg.get("1005");				//승인일시
-		
-		//틴캐시	
-		}else if("2500".equals(serviceCode)){		
-		
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			authDate = respMsg.get("1005");				//승인일시	
-			authNumber = respMsg.get("1004");			//승인번호	
-			authAmount = respMsg.get("1007");			//승인금액
-
-		// 에그머니	
-		}else if("2600".equals(serviceCode)){		
-		
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			authDate = respMsg.get("1005");				//승인일시	
-			authNumber = respMsg.get("1004");			//승인번호	
-			authAmount = respMsg.get("1007");			//승인금액
-		
-		//통합포인트	
-		}else if("4100".equals(serviceCode)){		
-
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			authDate = respMsg.get("1005");				//승인일시		
-			authAmount = respMsg.get("1007");			//승인금액
-		
-		//티머니	
-		}else if("1600".equals(serviceCode)){		
-			
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			authDate = respMsg.get("1005");				//승인일시		
-			authAmount = respMsg.get("1007");			//승인금액
-		
-		//폰빌
-		}else if("1200".equals(serviceCode)){	
-
-			//승인 응답
-			outResponseCode = respMsg.get("1002");
-			outResponseMessage = respMsg.get("1003");
-			outDetailResponseCode = respMsg.get("1009");
-			outDetailResponseMessage = respMsg.get("1010");
-			outTransactionId = respMsg.get("1001");		//거래번호
-			authDate = respMsg.get("1005");						//승인일시		
-			authAmount = respMsg.get("1007");			//승인금액
-
-		//그 외
-		}else {
+			outTransactionId = respMsg.get("1001");                //거래번호
+			authNumber = respMsg.get("1004");                    //승인번호
+			System.out.println(authNumber);
+			authDate = respMsg.get("1005");                        //승인일시
+			authAmount = respMsg.get("1007");                    //승인금액
+			quota = respMsg.get("0031");                                //할부개월 수
+			cardCompanyCode = respMsg.get("0034");            //카드발급사 코드
+		}else{
 %>				
 			<script type="text/javascript">
 				alert(<%=serviceCode%>+"RETURN 페이지 오류\n에러 메시지 : 결제수단의 서비스 코드를 확인해주세요!/ ");
 				window.close();
 			</script>
-<%	
+<%
 		}
-	}
+	} catch (Exception e) {
+        throw new RuntimeException(e);
+    }
 %>
 <html>
 <head>
@@ -364,274 +206,69 @@
 <meta charset="EUC-KR">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 <title>Insert title here</title>
+	<script src="https://pay.billgate.net/paygate/plugin/gx_web_client.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script>
+		$(function() {
+			var responseCode = "<%=responseCode%>";
+			console.log(responseCode);
+			if (responseCode === "0000") {
+				//정상일 때
+				//status 1로 만들고, 아이템 추가하고 결과창으로 옮기기
+				var orderNum = "<%=orderId%>"
+				var cardNum = <%=authNumber%>;
+				console.log(orderNum);
+				console.log(cardNum);
+				$.ajax({
+					url:"/purchase/success",
+					data: {
+						orderNum:orderNum,
+						cardNum:<%=authNumber%>
+					},
+					async:false,
+					type:'post',
+					success:function(result){
+
+						var orderid;
+						console.log(orderNum+"마지막 success");
+						$.ajax({
+							async: 'false',
+							url:'/order/getOrderId',
+							data:{
+								orderNum:orderNum
+							},
+							type: 'post',
+							success:function(result){
+								orderid=result;
+								window.parent.location.href = "/basket/complete?orderid="+orderid;
+							}
+						});
+					},
+					error:function(error){
+						console.log(error.responseText);
+					}
+				});
+
+			} else {
+				alert("알 수 없는 오류발생!");
+				//db에서 날려야함.
+				var orderNum = "<%=orderId%>"
+				$.post({
+					url:"/order/cancle",
+					type:'post',
+					async:'false',
+					data:{
+						orderNum:orderNum
+					},
+					success:function(result){
+						window.parent.location.href="/";
+					}
+				});
+			}
+		});
+	</script>
 </head>
 <body>
-	<div>
-		<table width="380px" border="0" cellpadding="0"	cellspacing="0">
-		<tr> 
-			<td height="25" style="padding-left:10px" class="title01"># 현재위치 &gt;&gt; 결제테스트 &gt; <b>가맹점 Return Url</b></td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td align="center">
-				<table width="380" border="0" cellpadding="4" cellspacing="1" bgcolor="#B0B0B0">
-					<tr>
-						<td><b>인증결과</b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>가맹점 아이디</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=serviceId%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>서비스 코드</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=serviceCode%></b></td>
-					</tr>
-<%
-	//휴대폰(1100), 폰빌(1200) 인증 결과 파라미터 추가_서비스타입(0000:일반/1000:월자동)
-	if("1100".equals(serviceCode)||"1200".equals(serviceCode)){
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>서비스 타입</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=serviceType%></b></td>
-					</tr>
-<%
-    }
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>주문번호</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=orderId%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>주문일시</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=orderDate%></b></td>
-					</tr>
-<%
-	//캐시게이트(0700), 신용카드(0900) 거래번호 출력 제외
-	if(!("0700".equals(serviceCode)||"0900".equals(serviceCode))){
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>거래번호</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=transactionId%></b></td>
-					</tr>
-<%
-    } 
-	 //가상계좌(1800) 채번 정보
-    if ("1800".equals(serviceCode) && "0000".equals(responseCode)) 
-    {
-%>			
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>가상계좌번호</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=accountNumber%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>금액</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=amount%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>은행코드</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=bankCode%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>거래구분</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=mixType%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>입금 유효 만료일</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=expireDate%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>입금 마감 시간</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=expireTime%></b></td>
-					</tr>
-<% 
-    } 
-	//틴캐시(2500) 인증구분
-	if("2500".equals(serviceCode)){
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>인증 구분</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=confType%></b></td>
-					</tr>
-<%
-	}	
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>응답코드</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=responseCode%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>응답메시지</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=responseMessage%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>상세응답코드</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=detailResponseCode%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>상세응답메시지</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=detailResponseMessage%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>예비변수1</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=reserved1 %></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>예비변수2</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=reserved2 %></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>예비변수3</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=reserved3 %></b></td>
-					</tr>	
-					
-                    <!--인증결과 끝-->
-                    <!--승인결과 시작-->
-
-					<tr>
-						<td><b>승인결과</b></td>
-					</tr>
-<%
-    if (outResponseCode!=null){ 
-%>	
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>거래번호</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=outTransactionId%></b></td>
-					</tr>					
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>승인일시</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=authDate%></b></td>
-					</tr>
-<% 
-	//캐시게이트(0700) 일 경우, 결제금액은 dealAmount로 표시
-	if("0700".equals(serviceCode)){	 
-%>			
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>승인금액</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=dealAmount%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>잔액</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=balance%></b></td>
-					</tr>			
-<%
-	}else{	
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>승인금액</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=authAmount%></b></td>
-					</tr>	
-<%
-}
-	//신용카드(0900), 과세 금액 항목 추가
-	if("0900".equals(serviceCode)){
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>할부개월 수</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=quota%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>카드 발급사 코드</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=cardCompanyCode%></b></td>
-					</tr>
-<%
-	}
-%>
-				
-<%
-	//신용카드(0900), 계좌이체(0100), 문화상품권(0200), 게임문화상품권(0300), 해피머니상품권(0500), 틴캐시(2500),에그머니(2600), 승인 응답 파라미터 추가
-	if("0900".equals(serviceCode)||"0100".equals(serviceCode)||"0200".equals(serviceCode)||"0300".equals(serviceCode)||"0500".equals(serviceCode)||"2500".equals(serviceCode)||"2600".equals(serviceCode)){	
-%>			
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>승인번호</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=authNumber%></b></td>
-					</tr>			
-<%
-	}
-	//계좌이체(1000)일 경우, 응답 파라미터 추가		
-	if("1000".equals(serviceCode)){		
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>거래구분</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=mixType%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>현금영수증 용도</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=usingType%></b></td>
-					</tr>	
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>현금영수증 승인번호</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=identifier%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>현금영수증 자진발급제유무</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=identifierType%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>은행 코드</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=inputBankCode%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>은행명</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=inputAccountName%></b></td>
-					</tr>
-<%
-	}	
-	//휴대폰(1100)이면서 일반 결제(serviceType:0000) 일 경우, 승인 응답 파라미터 추가
-	if("1100".equals(serviceCode)&&"0000".equals(serviceType)){
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>부분 취소 타입</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=partCancelType%></b></td>
-					</tr>	
-<%
-	}	
-%>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>응답코드</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=outResponseCode%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>응답메시지</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=outResponseMessage%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>상세응답코드</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=outDetailResponseCode%></b></td>
-					</tr>
-					<tr>
-						<td width="100" align="center" bgcolor="#F6F6F6"><b>상세응답메시지</b></td>
-						<td width="200" align="left" bgcolor="#FFFFFF">&nbsp;<b><%=outDetailResponseMessage%></b></td>
-					</tr>
-<%
-	}else{						
-%>
-					<tr>
-						<td width="300" align="center" bgcolor="#F6F6F6" colspan="2"><b>승인 결과 없음</b></td>
-					</tr>		
-<%
-	}	
-%>					
-					<!-- 승인결과 끝-->
-			</table>
-			</td>
-		</tr>
-	</table>
-		
-	<%	
-	}catch(Exception ex){
-%>				
-			<script type="text/javascript">
-				alert("RETURN 페이지 오류\n에러 메시지 : 승인 요청 오류! ");
-				window.close();
-			</script>
-<%	
-		ex.printStackTrace();
-	}
-	%>
-	</div>
-	<br>
 </body>
 
 </html>

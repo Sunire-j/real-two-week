@@ -121,4 +121,10 @@ where od.order_idorder=#{param1};
         where member_id=#{param1};
     </update>
 
+    <delete id="deleteOrder">
+        delete
+        from `order`
+        where orderNum=#{param1}
+    </delete>
+
 </mapper>

@@ -248,37 +248,39 @@
                     },
                     success: function (result) {
 
+                        var orderNum;
+                        var orderid = result;
                         if (result > 0) {
-                            var orderid = result;
-                            var orderNum;
-                            var checksum;
-                            $.post("/order/getOrderNum", {orderid: orderid}, function (result) {
-                                orderNum = result;
-                                //오더아이디 폼에 넣어줌
+                        $.ajax({
+                            url:'/goods/addItemToOrder',
+                            type:'post',
+                            data:{
+                                orderid : orderid,
+                                items_id : [[${ivo.items_id}]],
+                                amount:[[${amount}]]
+                            },
+                            success:function(result){
+                                $.post("/order/getOrderNum", {orderid: orderid}, function (result) {
+                                    orderNum = result;
 
-                                $("#USER_EMAIL").val(email);
-                                $("#ORDER_ID").val("SHOPTEMPJSH" + orderNum);
-                                $("#CHECK_SUM").val(result);
-                                if ($("input[name='method']:checked").val() == 2) {
-                                    GX_pay("TEMP_FORM", "layerpopup", "https_tpay");
-                                }
+                                    $("#USER_EMAIL").val(email);
+                                    $("#ORDER_ID").val(orderNum);
+                                    $("#CHECK_SUM").val(result);
+                                    if ($("input[name='method']:checked").val() == 2) {
+                                        GX_pay("TEMP_FORM", "layerpopup", "https_tpay");
+                                    }else{
+                                        location.href="/basket/complete?orderid="+orderid;
+                                    }
+                                })
+                                // location.href="/basket/complete?orderid="+orderid;
+                            },
+                            error:function(error){
+                                console.log(error.responseText);
+                            }
+                        });
 
-                                // $.ajax({
-                                //     url:'/goods/addItemToOrder',
-                                //     type:'post',
-                                //     data:{
-                                //         orderid : orderid,
-                                //         items_id : [[${ivo.items_id}]],
-                                //         amount:[[${amount}]]
-                                //     },
-                                //     success:function(result){
-                                //         location.href="/basket/complete?orderid="+orderid;
-                                //     },
-                                //     error:function(error){
-                                //         console.log(error.responseText);
-                                //     }
-                                // });
-                            })
+
+
 
                         }
 

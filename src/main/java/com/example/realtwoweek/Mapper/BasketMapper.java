@@ -36,4 +36,6 @@ public interface BasketMapper {
     void statusIncrease(int orderid);
 
     void deleteAccount(Long uid);
+
+    int deleteOrder(String orderNum);
 }

@@ -28,13 +28,13 @@
     <select id="getOrderTotalRecord" resultType="Integer">
         select count(idorder)
         from `order`
-        where status != 3 and status !=-2
+        where status != 3 and status !=-2 and status!=-3
     </select>
 
     <select id="getOrderList" resultType="com.example.realtwoweek.vo.OrderVO">
         select *
         from `order`
-        where status != 3 and status !=-2
+        where status != 3 and status !=-2 and status!=-3
         order by date desc
         limit #{onePageRecord} offset #{offsetPoint};
     </select>
@@ -54,13 +54,13 @@
     <select id="getOrderCompleteTotalRecord" resultType="Integer">
         select count(idorder)
         from `order`
-        where status = 3 or status = -2
+        where status = 3 or status = -2 and status!=-3
     </select>
 
     <select id="getOrderListComplete" resultType="com.example.realtwoweek.vo.OrderVO">
         select *
         from `order`
-        where status = 3 or status =-2
+        where status = 3 or status =-2 and status!=-3
         order by date desc
         limit #{onePageRecord} offset #{offsetPoint};
     </select>

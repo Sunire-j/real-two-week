@@ -65,4 +65,10 @@
         from `order`
         where idorder=#{param1};
     </select>
+
+    <select id="getOrderId" resultType="Integer">
+        select idorder
+        from `order`
+        where orderNum=#{param1}
+    </select>
 </mapper>

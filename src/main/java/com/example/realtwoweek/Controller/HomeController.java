@@ -41,19 +41,16 @@ public class HomeController{
         return "th/index";
     }
 
-    @GetMapping("/error")
-    public String errorPage(){
-        return "error";
-    }
-
     @PostMapping("/order/getOrderNum")
     @ResponseBody
     public String getOrderNum(int orderid){
         return itemMapper.getOrderNum(orderid);
     }
 
-    @GetMapping("/testtesttest")
-    private String testForm(){
-        return"th/index2";
+    @PostMapping("/order/getOrderId")
+    @ResponseBody
+    public int getOrderId(String orderNum){
+        return itemMapper.getOrderId(orderNum);
     }
+
 }

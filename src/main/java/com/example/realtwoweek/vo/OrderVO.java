@@ -25,4 +25,5 @@ public class OrderVO {
     private String orderNum;
     private int totalprice;
     private int delivery;
+    private String cardNum;
 }

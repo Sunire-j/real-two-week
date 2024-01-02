@@ -38,9 +38,11 @@ create table basket
     items_id  int           not null,
     amount    int default 1 not null,
     constraint fk_basket_items1
-        foreign key (items_id) references items (items_id),
+        foreign key (items_id) references items (items_id)
+            on update cascade on delete cascade,
     constraint fk_table1_member
         foreign key (member_id) references member (member_id)
+            on update cascade on delete cascade
 );
 
 create index fk_basket_items1_idx
@@ -62,6 +64,7 @@ create table methoddetail
     type     varchar(255) not null,
     detailid int auto_increment
         primary key,
+    name     varchar(255) null,
     constraint fk_methoddetail_method1
         foreign key (idmethod) references method (idmethod)
 );
@@ -73,9 +76,9 @@ create table `order`
 (
     idorder         int auto_increment
         primary key,
-    member_id       bigint                             not null,
+    member_id       bigint                             null,
     date            datetime default CURRENT_TIMESTAMP not null,
-    status          int                                not null,
+    status          int      default 0                 not null,
     ordername       varchar(255)                       not null,
     orderphonenum   varchar(255)                       not null,
     orderemail      varchar(255)                       not null,
@@ -105,10 +108,11 @@ create table orderdetail
     order_idorder  int not null,
     items_items_id int not null,
     amount         int not null,
-    constraint fk_orderdetail_items1
-        foreign key (items_items_id) references items (items_id),
     constraint fk_orderdetail_order1
-        foreign key (order_idorder) references `order` (idorder)
+        foreign key (order_idorder) references `order` (idorder),
+    constraint orderdetail_items_items_id_fk
+        foreign key (items_items_id) references items (items_id)
+            on update cascade on delete cascade
 );
 
 create index fk_orderdetail_items1_idx
@@ -116,4 +120,5 @@ create index fk_orderdetail_items1_idx
 
 create index fk_orderdetail_order1_idx
     on orderdetail (order_idorder);
+
 

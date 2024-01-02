@@ -113,6 +113,25 @@
         }
 
         $(function () {
+            var now = new Date();
+
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+
+            if (month < 10) month = '0' + month;
+            if (date < 10) date = '0' + date;
+            if (hours < 10) hours = '0' + hours;
+            if (minutes < 10) minutes = '0' + minutes;
+            if (seconds < 10) seconds = '0' + seconds;
+
+            var currentTime = '' + year + month + date + hours + minutes + seconds;
+
+            $("#ORDER_DATE").val(currentTime);
+
             $("#domaintype").on('change', function () {
                 var domain = $(this).val();
                 if (domain == 'none') {
@@ -220,8 +239,9 @@
                         methodDetails:methodDetails
                     },
                     success:function(result){
-                        if(result>0){
-                            var orderid = result;
+                        var orderNum;
+                        var orderid = result;
+                        if (result > 0) {
                             $.ajax({
                                 url:'/basket/addItemToOrder',
                                 type:'post',
@@ -229,16 +249,26 @@
                                     orderid : orderid
                                 },
                                 success:function(result){
-                                    location.href="/basket/complete?orderid="+orderid;
+                                    $.post("/order/getOrderNum", {orderid: orderid}, function (result) {
+                                        orderNum = result;
+
+                                        $("#USER_EMAIL").val(email);
+                                        $("#ORDER_ID").val(orderNum);
+                                        $("#CHECK_SUM").val(result);
+                                        if ($("input[name='method']:checked").val() == 2) {
+                                            GX_pay("TEMP_FORM", "layerpopup", "https_tpay");
+                                        }else{
+                                            location.href="/basket/complete?orderid="+orderid;
+                                        }
+                                    })
+                                    // location.href="/basket/complete?orderid="+orderid;
                                 },
                                 error:function(error){
                                     console.log(error.responseText);
                                 }
                             });
                         }
-
-                    },
-                    error:function(error){
+                    }, error:function(error){
                         console.log(error.responseText);
                     }
                 })
@@ -267,6 +297,7 @@
 <body>
 <div th:replace="fragments/header::header"></div>
 <div class="container">
+    <form name="TEMP_FORM">
     <div class="basket-top">
         <h2 style="font-weight: bold">주문/결제</h2>
         <hr/>
@@ -451,6 +482,18 @@
 
 
     </div>
+        <input type="hidden" value="0" name="ITEM_CODE"/>
+        <input type="hidden" name="SERVICE_CODE" value="0900"/>
+        <input type="hidden" name="ITEM_NAME" id="ITEM_NAME" th:value="${itemname}"/>
+        <input type="hidden" name="SERVICE_ID" id="SERVICE_ID" value="M2103135"/>
+        <input type="hidden" name="ORDER_ID" id="ORDER_ID" value=""/>
+        <input type="hidden" name="ORDER_DATE" id="ORDER_DATE"/>
+        <input type="hidden" name="AMOUNT" id="AMOUNT" th:value="${sumPrice+maxDelivery}"/>
+        <input type="hidden" name="RETURN_URL" id="RETURN_URL" value="http://localhost:9999/purchase/confirm"/>
+        <input type="hidden" name="USER_ID" th:value="${userid}"/>
+        <input type="hidden" name="USER_EMAIL" id="USER_EMAIL"/>
+        <input type="hidden" name="SERVICE_TYPE" value="0000"/>
+    </form>
 </div>
 <div th:replace="fragments/footer::footer"></div>
 </body>

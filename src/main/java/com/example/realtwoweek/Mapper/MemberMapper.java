@@ -40,5 +40,7 @@ public interface MemberMapper {
 
     int editInfoSocial(MemberVO mvo);
 
+    int setStatus(OrderVO ovo);
+
 
 }

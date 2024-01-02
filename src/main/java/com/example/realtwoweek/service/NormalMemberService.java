@@ -3,6 +3,7 @@ package com.example.realtwoweek.service;
 import com.example.realtwoweek.domain.Member;
 import com.example.realtwoweek.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Primary
 public class NormalMemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;

@@ -29,6 +29,7 @@ public class HeaderController {
     @GetMapping("/nickname")
     public String getNickname() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.toString());
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof OAuth2User) {  // OAuth2.0 로그인 사용자

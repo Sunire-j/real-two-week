@@ -66,6 +66,8 @@
         <h3 style="color: #f87502; font-weight: bold" th:case="1">결제완료</h3>
         <h3 style="color: #f87502; font-weight: bold" th:case="2">배송시작</h3>
         <h3 style="color: #f87502; font-weight: bold" th:case="3">배송완료</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="-1">취소신청</h3>
+        <h3 style="color: #f87502; font-weight: bold" th:case="-2">취소완료</h3>
     </div>
     <h5 style="font-weight: bold">주문자 정보</h5>
     <div class="order-container">
@@ -129,7 +131,7 @@
                     <div th:text="|결제 예정금액 : ${#numbers.formatInteger(ovo.totalprice+ovo.delivery,3,'COMMA')+'원'}|"></div>
                 </div>
                 <span th:case="2">
-                    <div th:text="|결제 카드 정보 : 1111-2222-****-4444|"></div>
+                    <div th:text="|승인번호 : ${ovo.cardNum}|"></div>
                     <div th:text="|승인일자 : ${ovo.date}|"></div>
                     <div th:text="|승인금액 : ${#numbers.formatInteger(ovo.totalprice+ovo.delivery,3,'COMMA')+'원'}|"></div>
                 </span>

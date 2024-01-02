@@ -53,7 +53,7 @@
     <select id="getOrderList" resultType="com.example.realtwoweek.vo.OrderVO">
         select *
         from `order`
-        where member_id=#{param1}
+        where member_id=#{param1} and status!=-3
         order by date desc;
     </select>
 
@@ -104,6 +104,12 @@
         set zipno=#{zipno}, address1=#{address1}, address2=#{address2},
             address3=#{address3}, phone=#{phone}
         where member_id=#{member_id}
+    </update>
+
+    <update id="setStatus" parameterType="com.example.realtwoweek.vo.OrderVO">
+        update `order`
+        set status=#{status}, cardNum=#{cardNum}
+        where idorder=#{idorder}
     </update>
 
 </mapper>

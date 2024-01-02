@@ -1,6 +1,8 @@
 package com.example.realtwoweek.Controller;
 
 
+import com.example.realtwoweek.Mapper.MemberMapper;
+import com.example.realtwoweek.vo.OrderVO;
 import com.example.realtwoweek.vo.PurchaseReturnParam;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,12 @@ import javax.xml.ws.Service;
 
 public class PurchaseController {
 
+    private final MemberMapper memberMapper;
+
+    public PurchaseController(MemberMapper memberMapper) {
+        this.memberMapper = memberMapper;
+    }
+
     @PostMapping("/purchase/confirm")
     public String returnURL(PurchaseReturnParam prp, Model model){
         if(prp.getRESPONSE_CODE().equals("0000"))
@@ -28,6 +36,16 @@ public class PurchaseController {
         model.addAttribute("DETAIL_RESPONSE_MESSAGE", prp.getDETAIL_RESPONSE_MESSAGE());
         System.out.println(prp.toString());
         return "/PayReturn";
+    }
+
+    @PostMapping("/purchase/success")
+    @ResponseBody
+    public int successCardMethod(String orderNum, String cardNum){
+        //status를 1로 바꿔주기만 함
+        OrderVO ovo = memberMapper.getOrderDetailWithOrderNum(orderNum);
+        ovo.setStatus(0);
+        ovo.setCardNum(cardNum);
+        return memberMapper.setStatus(ovo);
     }
 
 }

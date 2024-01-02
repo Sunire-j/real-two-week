@@ -25,4 +25,6 @@ public interface ItemMapper {
 
     String getOrderNum(int orderid);
 
+    int getOrderId(String ordernum);
+
 }

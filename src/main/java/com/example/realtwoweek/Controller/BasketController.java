@@ -120,6 +120,7 @@ public class BasketController {
     public String purchase(Authentication authentication, Model model){
         UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
         Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        model.addAttribute("userid", userid);
 
         List<BasketVO> bList = basketMapper.getAllBasket(userid);
 
@@ -134,6 +135,11 @@ public class BasketController {
 
         model.addAttribute("maxDelivery", maxDelivery);
         model.addAttribute("sumPrice",total);
+        String itemname = bList.get(0).getName();
+        itemname += " 외 "+String.valueOf(bList.size()-1) +"건";
+        model.addAttribute("itemname",itemname);
+
+
 
         model.addAttribute("blist",bList);
 
@@ -195,6 +201,11 @@ public class BasketController {
         String ordernum = now.format(formatter)+userid.toString();
         ovo.setOrderNum(ordernum);
         int result = basketMapper.addNewOrder(ovo);
+        if(ovo.getMethod()==2){
+            //여기에서 -3으로 바꿔줘야함
+            ovo.setStatus(-3);
+            memberMapper.setStatus(ovo);
+        }
         return ovo.getIdorder();
     }
 
@@ -314,5 +325,11 @@ public class BasketController {
         ItemVO ivo = itemMapper.getItemDetail(items_id);
         basketMapper.setPrice(orderid, ivo.getPrice()*amount, ivo.getDelivery());
         return orderid;
+    }
+
+    @PostMapping("/order/cancle")
+    @ResponseBody
+    private int orderCancle(String orderNum){
+        return basketMapper.deleteOrder(orderNum);
     }
 }
