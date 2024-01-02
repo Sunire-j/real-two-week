@@ -1,9 +1,10 @@
 package com.example.realtwoweek;
 
 import com.example.realtwoweek.config.auth.OAuthService;
-import com.example.realtwoweek.config.jwt.JwtAuthenticationFilter;
-import com.example.realtwoweek.config.jwt.JwtAuthenticationSuccessHandler;
-import com.example.realtwoweek.config.jwt.JwtTokenProvider;
+import com.example.realtwoweek.jwt.JwtAccessDeniedHandler;
+import com.example.realtwoweek.jwt.JwtAuthenticationEntryPoint;
+import com.example.realtwoweek.jwt.JwtSecurityConfig;
+import com.example.realtwoweek.jwt.TokenProvider;
 import com.example.realtwoweek.service.DelegatingUserDetailsService;
 import com.example.realtwoweek.service.MemberService;
 import com.example.realtwoweek.service.NormalMemberService;
@@ -29,25 +30,36 @@ public class SecurityConfig {
     private final MemberService memberService;
     @Autowired
     private NormalMemberService normalMemberService;
-    private JwtTokenProvider jwtTokenProvider;
 
-    public SecurityConfig(OAuthService oAuthService, MemberService memberService, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final TokenProvider tokenProvider;
+
+    public SecurityConfig(OAuthService oAuthService, MemberService memberService, PasswordEncoder passwordEncoder, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtAccessDeniedHandler jwtAccessDeniedHandler, TokenProvider tokenProvider) {
         this.oAuthService = oAuthService;
         this.memberService = memberService;
         this.passwordEncoder = passwordEncoder;
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+        this.tokenProvider = tokenProvider;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider);
 
 
 
         http
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .and()
                 .cors().disable()
                 .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .headers().frameOptions().disable()
                 .and()
                 .logout().logoutSuccessUrl("/")
@@ -68,14 +80,11 @@ public class SecurityConfig {
                 .formLogin()
                 .loginPage("/signin")
                 .loginProcessingUrl("/LoginOk")
-                .successHandler(new JwtAuthenticationSuccessHandler(jwtTokenProvider))
                 .usernameParameter("userid")
                 .passwordParameter("userpwd")
                 .defaultSuccessUrl("/")
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .apply(new JwtSecurityConfig(tokenProvider));
 
         return http.build();
     }
