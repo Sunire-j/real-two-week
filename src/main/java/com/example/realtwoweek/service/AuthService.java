@@ -2,6 +2,10 @@ package com.example.realtwoweek.service;
 
 import com.example.realtwoweek.domain.Member;
 import com.example.realtwoweek.domain.RefreshToken;
+import com.example.realtwoweek.dto.MemberRequestDto;
+import com.example.realtwoweek.dto.MemberResponseDto;
+import com.example.realtwoweek.dto.TokenDto;
+import com.example.realtwoweek.dto.TokenRequestDto;
 import com.example.realtwoweek.jwt.TokenProvider;
 import com.example.realtwoweek.repository.MemberRepository;
 import com.example.realtwoweek.repository.RefreshTokenRepository;
@@ -56,6 +60,8 @@ public class AuthService {
 
     @Transactional
     public TokenDto reissue(TokenRequestDto tokenRequestDto) {
+
+
         // 1. Refresh Token 검증
         if (!tokenProvider.validateToken(tokenRequestDto.getRefreshToken())) {
             throw new RuntimeException("Refresh Token 이 유효하지 않습니다.");
@@ -68,6 +74,8 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
 
+        System.out.println(refreshToken.getValue()+"겟벨류");
+        System.out.println(tokenRequestDto.getRefreshToken()+"겟리프레쉬토큰");
         // 4. Refresh Token 일치하는지 검사
         if (!refreshToken.getValue().equals(tokenRequestDto.getRefreshToken())) {
             throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다.");

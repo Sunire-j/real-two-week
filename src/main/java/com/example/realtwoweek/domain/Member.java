@@ -2,16 +2,22 @@ package com.example.realtwoweek.domain;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @Entity
 @Data
 @Table(name = "member")
-public class Member {
+public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -49,6 +55,46 @@ public class Member {
 
     @Column(name="address3")
     private String address3;
+
+    @Transient
+    private List<GrantedAuthority> authorities;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (authorities == null) {
+            authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            if (this.isAdmin()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            }
+        }
+        return authorities;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 
     @Builder
     public Member(String address3,Integer zipno,String address2,String address1,String password, Long id, String name, String email, String provider, String nickname, boolean isAdmin) {

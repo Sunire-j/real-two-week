@@ -1,5 +1,6 @@
 package com.example.realtwoweek;
 
+import com.example.realtwoweek.config.auth.CustomAuthenticationSuccessHandler;
 import com.example.realtwoweek.config.auth.OAuthService;
 import com.example.realtwoweek.jwt.JwtAccessDeniedHandler;
 import com.example.realtwoweek.jwt.JwtAuthenticationEntryPoint;
@@ -30,19 +31,24 @@ public class SecurityConfig {
     private final MemberService memberService;
     @Autowired
     private NormalMemberService normalMemberService;
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final TokenProvider tokenProvider;
 
-    public SecurityConfig(OAuthService oAuthService, MemberService memberService, PasswordEncoder passwordEncoder, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtAccessDeniedHandler jwtAccessDeniedHandler, TokenProvider tokenProvider) {
+    public SecurityConfig(OAuthService oAuthService, MemberService memberService, PasswordEncoder passwordEncoder, CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtAccessDeniedHandler jwtAccessDeniedHandler, TokenProvider tokenProvider) {
         this.oAuthService = oAuthService;
         this.memberService = memberService;
         this.passwordEncoder = passwordEncoder;
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
         this.tokenProvider = tokenProvider;
     }
+
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -65,15 +71,16 @@ public class SecurityConfig {
                 .logout().logoutSuccessUrl("/")
                 .and()
                 .oauth2Login()
-                .defaultSuccessUrl("/", true)
+                .successHandler(customAuthenticationSuccessHandler)
+                //.defaultSuccessUrl("/", true)
                 .userInfoEndpoint()
                 .userService(oAuthService)
                 .and()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/", "/signin", "/signup/**", "/signup", "/LoginOk", "/goods/view","/purchase/confirm", "/js/**", "/css/**", "/img/**",
-                        "/upload/**").permitAll()
-                .antMatchers("/loginInfo", "/basket/**", "/mypage").hasAnyRole("USER", "ADMIN")
+                        "/upload/**", "/auth/**", "/error").permitAll()
+                .antMatchers("/loginInfo", "/basket/**", "/mypage", "/api/nickname", "/mypage/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()

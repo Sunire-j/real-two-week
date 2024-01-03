@@ -20,12 +20,12 @@
         <div class="header_top">
             <div></div>
             <ul>
-                <li th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}"><a href="/signin">로그인</a></li>
-                <li th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}">&nbsp;|&nbsp;</li>
-                <li th:if="${#authentication == null or #authentication.principal == 'anonymousUser'}"><a href="/signup">회원가입</a></li>
-                <li th:if="${#authentication != null and #authentication.principal != 'anonymousUser'}"><a id="nickname" href="#"></a></li>
-                <li th:if="${#authentication != null and #authentication.principal != 'anonymousUser'}">&nbsp;|&nbsp;</li>
-                <li th:if="${#authentication != null and #authentication.principal != 'anonymousUser'}"><a href="/logout">로그아웃</a></li>
+                <li class="unauthenticated"><a href="/signin">로그인</a></li>
+                <li class="unauthenticated">&nbsp;|&nbsp;</li>
+                <li class="unauthenticated"><a href="/signup">회원가입</a></li>
+                <li class="authenticated"><a id="nickname" href="#"></a></li>
+                <li class="authenticated">&nbsp;|&nbsp;</li>
+                <li class="authenticated"><a id="logout" style="cursor: pointer">로그아웃</a></li>
                 <li>&nbsp;|&nbsp;</li>
                 <li><a href="/basket">장바구니</a></li>
                 <li>&nbsp;|&nbsp;</li>
@@ -46,12 +46,74 @@
         </ul>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $.get("/api/nickname", function(data) {
-                $("#nickname").text(data);
-                startScript();
+        $(document).ready(function() {
+            var token = localStorage.getItem('accessToken');
+
+            if (token) {
+                // 모든 AJAX 요청에 기본 헤더 설정
+                $.ajaxSetup({
+                    headers: {
+                        Authorization: 'Bearer ' + token
+                    }
+                });
+
+                // 로그인 상태일 때 보이는 메뉴를 표시
+                $('.authenticated').show();
+                $('.unauthenticated').hide();
+
+            } else {
+                // 로그아웃 상태일 때 보이는 메뉴를 표시
+                $('.unauthenticated').show();
+                $('.authenticated').hide();
+            }
+
+            // 예시 AJAX 요청
+            $.ajax({
+                url: "/api/nickname",  // 요청 URL
+                type: "GET",          // 요청 메서드
+                success: function(data) {
+                    $('#nickname').text(data);
+                },
+                error: function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        // 토큰 갱신 로직
+                        var refreshToken = localStorage.getItem('refreshToken');
+                        $.ajax({
+                            url: '/auth/reissue',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                refreshToken: refreshToken,
+                                accessToken: token
+                            }),
+                            success: function(response) {
+                                localStorage.setItem('accessToken', response.accessToken);
+                                localStorage.setItem('refreshToken', response.refreshToken);
+                                // 새로운 토큰으로 원래 요청 재시도
+                                $.ajax(this); // 'this'는 원래 요청 설정을 참조
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Token refresh failed:", error);
+                                // 토큰 갱신 실패 시 추가 처리 필요
+                            }
+                        });
+                    } else {
+                        // 다른 종류의 에러 처리
+                    }
+                }
+            });
+
+            $('#logout').click(function() {
+                console.log("로그아웃 누름")
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
+                document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
+                $('.unauthenticated').show();
+                $('.authenticated').hide();
             });
         });
+
     </script>
 </header>
 </body>

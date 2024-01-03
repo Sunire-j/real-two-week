@@ -8,8 +8,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
     // JWT 토큰의 인증 정보를 현재 쓰레드의 SecurityContext 에 저장하는 역할 수행
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+
 
         // 1. Request Header 에서 토큰을 꺼냄
         String jwt = resolveToken(request);
@@ -40,9 +43,28 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // Request Header 에서 토큰 정보를 꺼내오기
     private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.split(" ")[1].trim();
+        boolean fromCookie = false;
+        Cookie[] cookies = request.getCookies();
+        String bearerToken ="";
+        if(request.getHeader("Authorization")!=null){
+            bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        }else{
+            if(cookies!=null){
+                for(Cookie cookie : cookies){
+                    if ("accessToken".equals(cookie.getName())) {
+                        bearerToken = cookie.getValue();
+                        fromCookie=true;
+                    }
+                }
+            }
+        }
+
+        if(fromCookie){
+            return bearerToken;
+        }else{
+            if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+                return bearerToken.split(" ")[1].trim();
+            }
         }
         return null;
     }

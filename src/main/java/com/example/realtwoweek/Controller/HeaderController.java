@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -27,15 +28,17 @@ public class HeaderController {
     private MemberRepository memberRepository;
 
     @GetMapping("/nickname")
+    @ResponseBody
     public String getNickname() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication.toString());
-        Object principal = authentication.getPrincipal();
 
+        Object principal = authentication.getPrincipal();
         if (principal instanceof OAuth2User) {  // OAuth2.0 로그인 사용자
+            System.out.println((String) ((OAuth2User) principal).getAttributes().get("name"));
             return (String) ((OAuth2User) principal).getAttributes().get("name");
-        } else if (principal instanceof User) {  // 일반 로그인 사용자
-            String username = ((User) principal).getUsername();
+
+        } else if (principal instanceof Member) {  // 일반 로그인 사용자
+            String username = ((Member) principal).getEmail();
             Member member = memberRepository.findByEmailAndProvider(username, "none")
                     .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
             return member.getName();

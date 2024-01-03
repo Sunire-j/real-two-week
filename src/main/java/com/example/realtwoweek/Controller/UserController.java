@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -95,9 +96,14 @@ public class UserController {
 
     @GetMapping("/user/address")
     @ResponseBody
-    private List<Object> getAddress(Authentication authentication) {
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    private List<Object> getAddress() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
 
         List<Object> address = new ArrayList<Object>();
         if (memberMapper.getZipno(userid) != 0) {
@@ -111,9 +117,16 @@ public class UserController {
 
     @GetMapping("/mypage")
 //    홈이긴 한데 주문내역이랑 다를바가 없음
-    private String myPage(Authentication authentication, Model model){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    private String myPage(Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
+
+
         List<OrderVO> orderVOList = memberMapper.getOrderList(userid);
         System.out.println(orderVOList);
         model.addAttribute(orderVOList);
@@ -121,9 +134,14 @@ public class UserController {
     }
 
     @GetMapping("/mypage/order")
-    private String orderDetail(Long no, Model model, Authentication authentication){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    private String orderDetail(Long no, Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         OrderVO order = memberMapper.getOrderDetail(no);
         if(!Objects.equals(userid, order.getMember_id())){
             return "404";
@@ -150,9 +168,14 @@ public class UserController {
     }
 
     @GetMapping("/byebye")
-    private String realDelete(Authentication auth){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    private String realDelete(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
 
         //탈퇴하기 전에 유저에 대한 주문정보같은건 분리를 해야함
         //멤버아이디만 null로 바꿔버림
@@ -163,9 +186,14 @@ public class UserController {
         return "redirect:/logout";
     }
     @GetMapping("/mypage/edit")
-    private String editInfo(Authentication auth, Model model){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    private String editInfo( Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         MemberVO memberVO = memberMapper.getUserInfo(userid);
 
         model.addAttribute("mvo",memberVO);
@@ -195,11 +223,16 @@ public class UserController {
 
     @PostMapping("/mypage/checkpwd")
     @ResponseBody
-    private boolean checkpwd(String pwd, Authentication auth){
+    private boolean checkpwd(String pwd){
 
         pwd = passwordEncoder.encode(pwd);
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         String encodedpwd = memberMapper.getUserpwd(userid);
 
         return encodedpwd.equals(pwd);
@@ -207,10 +240,14 @@ public class UserController {
 
     @PostMapping("/mypage/edit")
     @ResponseBody
-    private int changeInfo(MemberVO mvo, Authentication auth){
-        System.out.println(mvo.toString());
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    private int changeInfo(MemberVO mvo){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         mvo.setMember_id(userid);
 
         System.out.println(mvo.getPassword());
@@ -229,9 +266,9 @@ public class UserController {
         int result =  memberMapper.changeInfo(mvo);
         if(result>0 && mvo.getPassword()!=null){
             Authentication newAuth = new UsernamePasswordAuthenticationToken(
-                    auth.getPrincipal(),
+                    authentication.getPrincipal(),
                     mvo.getPassword(),
-                    auth.getAuthorities()
+                    authentication.getAuthorities()
             );
             SecurityContextHolder.getContext().setAuthentication(newAuth);
         }
@@ -248,9 +285,14 @@ public class UserController {
 
     @PostMapping("/mypage/social/edit")
     @ResponseBody
-    private int infoEditSocial(Authentication auth, MemberVO mvo){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    private int infoEditSocial(MemberVO mvo){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         mvo.setMember_id(userid);
         return memberMapper.editInfoSocial(mvo);
     }

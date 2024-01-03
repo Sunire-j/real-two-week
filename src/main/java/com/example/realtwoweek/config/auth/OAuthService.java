@@ -1,10 +1,17 @@
 package com.example.realtwoweek.config.auth;
 
 import com.example.realtwoweek.domain.Member;
+import com.example.realtwoweek.domain.RefreshToken;
+import com.example.realtwoweek.dto.TokenDto;
+import com.example.realtwoweek.jwt.TokenProvider;
 import com.example.realtwoweek.repository.MemberRepository;
+import com.example.realtwoweek.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -23,7 +30,8 @@ import java.util.*;
 public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final MemberRepository memberRepository;
-
+    private final TokenProvider tokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService delegate = new DefaultOAuth2UserService();
@@ -52,10 +60,28 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         }
 
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                member.getEmail(), // OAuth2 인증을 통해 얻은 이메일을 사용
+                null,
+                authorities
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // 토큰 생성
+        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+
+        // Refresh Token을 DB에 저장하는 로직
+        RefreshToken refreshToken = RefreshToken.builder()
+                .key(member.getEmail()) // Member의 이메일을 Key로 사용
+                .value(tokenDto.getRefreshToken())
+                .build();
+        refreshTokenRepository.save(refreshToken);
+
         return new DefaultOAuth2User(
                 authorities,
                 customAttribute,
-                userNameAttributeName);
+                userNameAttributeName
+        );
 
     }
 

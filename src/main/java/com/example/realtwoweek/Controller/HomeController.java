@@ -36,8 +36,6 @@ public class HomeController{
         List<ItemVO> RecommendList = itemMapper.getRecommendItems();
         model.addAttribute("newitems", Newlist);
         model.addAttribute("recommend",RecommendList);
-
-        System.out.println("testtest");
         return "th/index";
     }
 

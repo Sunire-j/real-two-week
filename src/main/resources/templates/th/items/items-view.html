@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <style>
         .items-img > img {
             width: 200px;
@@ -97,66 +98,69 @@
         .title {
             font-size: 20px;
         }
-        .item-amount{
+
+        .item-amount {
             margin-top: 20px;
             margin-bottom: 20px;
             text-align: center;
         }
     </style>
-    <script th:inline="javascript">
-        function startScript(){
+    <script>
+        $(function () {
             var id = [[${ivo.items_id}]];
 
-            $("#amount").on('change',function() {
-                if($(this).val()<0){
+            $("#amount").on('change', function () {
+                if ($(this).val() < 0) {
                     $(this).val(0);
                 }
             })
-            $("#buy").on('click', function(){
-                var amount = $("#amount").val().replace(/(^0+)/,"");
-                if(amount==0){
+            $("#buy").on('click', function () {
+                console.log("하이하이")
+                var amount = $("#amount").val().replace(/(^0+)/, "");
+                if (amount == 0) {
                     alert("수량은 1개 이상이여야합니다.");
                 }
-                var url="/goods/buy?items_id="+id;
-                url+="&amount="+amount;
-                location.href=url;
+                var url = "/goods/buy?items_id=" + id;
+                url += "&amount=" + amount;
+                location.href = url;
             });
-            $("#check").on('click',function(){
-                var amount = $("#amount").val().replace(/(^0+)/,"");
-                if(amount==0){
+            $("#check").on('click', function () {
+                var amount = $("#amount").val().replace(/(^0+)/, "");
+                if (amount == 0) {
                     alert("수량은 1개 이상이여야합니다.");
                 }
-                var url="/goods/check?items_id="+id;
-                url+="&amount="+amount;
-                $.get(url,function(data){
-                    if(data==0){
+                var url = "/goods/check?items_id=" + id;
+                url += "&amount=" + amount;
+                $.get(url, function (data) {
+                    if (data == 0) {
                         alert("알 수 없는 오류가 발생했습니다!");
-                    }else if(data==-1){
-                        location.href="/";
-                    }else{
+                    } else if (data == -1) {
+                        location.href = "/";
+                    } else {
                         openCenteredWindow('/add/success', 500, 300);
                     }
                 })
             });
+        });
 
-            function openCenteredWindow(url, width, height) {
-                // 화면의 중앙 위치 계산
-                const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-                const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+        function openCenteredWindow(url, width, height) {
+            // 화면의 중앙 위치 계산
+            const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+            const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
 
-                const innerWidth = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-                const innerHeight = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+            const innerWidth = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+            const innerHeight = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
 
-                const left = ((innerWidth / 2) - (width / 2)) + screenLeft;
-                const top = ((innerHeight / 2) - (height / 2)) + screenTop;
+            const left = ((innerWidth / 2) - (width / 2)) + screenLeft;
+            const top = ((innerHeight / 2) - (height / 2)) + screenTop;
 
-                // 팝업 창 옵션 설정
-                const windowFeatures = `width=${width},height=${height},top=${top},left=${left},resizable=no`;
+            // 팝업 창 옵션 설정
+            const windowFeatures = `width=${width},height=${height},top=${top},left=${left},resizable=no`;
 
-                // 팝업 창 열기
-                window.open(url, 'PopupWindow', windowFeatures);
-            }
+            // 팝업 창 열기
+            window.open(url, 'PopupWindow', windowFeatures);
         }
+
 
     </script>
 </head>
@@ -182,15 +186,15 @@
                     <div th:text="${ivo.seller}"></div>
                 </div>
             </div>
-                <div class="item-amount">
-                    <label>수량선택
-                        <input type="number" id="amount" class="form-control" name="amount" value="1" min="1">
-                    </label>
-                </div>
-                <div class="button-container">
-                    <input type="button" class="btn btn-warning btn-warning-sm" value="바로구매하기" id="buy">
-                    <input type="button" class="btn btn-dark btn-dark-sm" value="장바구니 담기" id="check">
-                </div>
+            <div class="item-amount">
+                <label>수량선택
+                    <input type="number" id="amount" class="form-control" name="amount" value="1" min="1">
+                </label>
+            </div>
+            <div class="button-container">
+                <input type="button" class="btn btn-warning btn-warning-sm" value="바로구매하기" id="buy">
+                <input type="button" class="btn btn-dark btn-dark-sm" value="장바구니 담기" id="check">
+            </div>
         </div>
 
     </div>

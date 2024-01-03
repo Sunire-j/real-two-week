@@ -152,8 +152,14 @@
                     $('#tel1').val($('select[name="tel1"]').val()).change();
                     $('#tel2').val($('input[name="tel2"]').val());
                     $('#tel3').val($('input[name="tel3"]').val());
+                    var token = localStorage.getItem('accessToken');
 
                     console.log("들어옴");
+                    $.ajaxSetup({
+                        headers: {
+                            Authorization: 'Bearer ' + token
+                        }
+                    });
                     $.ajax({
                         url: '/user/address',
                         type: 'get',
@@ -169,7 +175,7 @@
                         error: function (error) {
                             console.log(error.responseText);
                         }
-                    })
+                    });
                 } else {
                     console.log('깡통');
                 }
@@ -228,6 +234,13 @@
                 var email = "";
                 email += $("input[name='email1']").val() + "@" + $("#emaildomain").val();
 
+                var token = localStorage.getItem('accessToken');
+
+                $.ajaxSetup({
+                    headers: {
+                        Authorization: 'Bearer ' + token
+                    }
+                });
 
                 $.ajax({
                     url: '/basket/order',

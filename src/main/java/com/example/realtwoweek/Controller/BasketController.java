@@ -5,8 +5,10 @@ import com.example.realtwoweek.Mapper.ItemMapper;
 import com.example.realtwoweek.Mapper.MemberMapper;
 import com.example.realtwoweek.Util.AuthenticationUtil;
 import com.example.realtwoweek.Util.UserIdentity;
+import com.example.realtwoweek.domain.Member;
 import com.example.realtwoweek.vo.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,19 +40,14 @@ public class BasketController {
 
     @GetMapping("/goods/check") //회원
     @ResponseBody
-    public int addBasket(@RequestParam int items_id, @RequestParam int amount, Authentication authentication) {
-        if (authentication == null) {
-            return -1;
+    public int addBasket(@RequestParam int items_id, @RequestParam int amount) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
         }
-
-        System.out.println(authentication.toString());
-
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        System.out.println(userIdentity.getProvider() + " : provider");
-        System.out.println(userIdentity.getEmail()+" : email");
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
-
-
 
         //일단 넣기 전에 이미 장바구니에 추가된 아이템인지를 알아야함
         //만약 있다면 amount만 늘리는 방향으로 가야함
@@ -70,9 +67,14 @@ public class BasketController {
     }
 
     @GetMapping("/basket")
-    public String mybasket(Authentication authentication, Model model){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    public String mybasket(Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         List<BasketVO> bList = basketMapper.getAllBasket(userid);
 
         int maxDelivery = bList.stream()
@@ -98,9 +100,14 @@ public class BasketController {
 
     @PostMapping("/basket/setAmount")
     @ResponseBody
-    public int setAmount(int itemid, int amount, Authentication authentication){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    public int setAmount(int itemid, int amount){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
 
         int result = basketMapper.SetAmount(userid, itemid, amount);
         return result;
@@ -108,18 +115,28 @@ public class BasketController {
 
     @PostMapping("/basket/dropItem")
     @ResponseBody
-    public int dropItem(int itemid, Authentication authentication){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    public int dropItem(int itemid){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
 
         int result = basketMapper.dropItem(userid, itemid);
         return result;
     }
 
     @GetMapping("/basket/purchase")
-    public String purchase(Authentication authentication, Model model){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    public String purchase(Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         model.addAttribute("userid", userid);
 
         List<BasketVO> bList = basketMapper.getAllBasket(userid);
@@ -168,9 +185,9 @@ public class BasketController {
         model.addAttribute("phone2", phone2);
         model.addAttribute("phone3", phone3);
 
-        String emailid = userIdentity.getEmail().substring(0,userIdentity.getEmail().indexOf('@'));
+        String emailid = ((Member) principal).getEmail().substring(0,((Member) principal).getEmail().indexOf('@'));
         model.addAttribute("emailid", emailid);
-        String emaildomain = userIdentity.getEmail().substring(userIdentity.getEmail().indexOf('@')+1);
+        String emaildomain = ((Member) principal).getEmail().substring(((Member) principal).getEmail().indexOf('@')+1);
         model.addAttribute("emaildomain",emaildomain);
         String username = memberMapper.getUsername(userid);
         model.addAttribute("username", username);
@@ -188,10 +205,14 @@ public class BasketController {
 
     @PostMapping("/basket/order")
     @ResponseBody
-    public int orderBasket(OrderVO ovo, Authentication authentication){
-        System.out.println(ovo.toString());
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    public int orderBasket(OrderVO ovo){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         ovo.setMember_id(userid);
         if(ovo.getMethod()!=1){
             ovo.setMethodDetails(0);
@@ -211,9 +232,14 @@ public class BasketController {
 
     @PostMapping("/basket/addItemToOrder")
     @ResponseBody
-    public int addItemToOrder(Authentication authentication, int orderid){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    public int addItemToOrder(int orderid){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         List<BasketVO> list = basketMapper.getAllBasket(userid);
         for(BasketVO basket : list){
             basketMapper.addItemToOrder(basket.getItems_id(), basket.getAmount(), orderid);
@@ -234,13 +260,18 @@ public class BasketController {
     }
 
     @GetMapping("/basket/complete")
-    public String orderComplete(Model model, int orderid, Authentication authentication){
+    public String orderComplete(Model model, int orderid){
 
         OrderVO ovo = basketMapper.getOrder(orderid);
 
         //여기서 장바구니 비워줘야함
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(authentication);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
         basketMapper.basketEmpty(userid);
 
         //모델에 들어갈 것
@@ -267,9 +298,14 @@ public class BasketController {
     }
 
     @GetMapping("/goods/buy")
-    public String oneitemOrder(int items_id, int amount, Authentication auth, Model model){
-        UserIdentity userIdentity = AuthenticationUtil.getUserIdentity(auth);
-        Long userid = memberMapper.getUserid(userIdentity.getProvider(), userIdentity.getEmail());
+    public String oneitemOrder(int items_id, int amount, Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        Long userid = null;
+        if (principal instanceof Member) {
+            userid = ((Member) principal).getId();
+        }
 
         ItemVO ivo = itemMapper.getItemDetail(items_id);
         model.addAttribute("maxDelivery", ivo.getDelivery());
@@ -296,9 +332,9 @@ public class BasketController {
         model.addAttribute("phone2", phone2);
         model.addAttribute("phone3", phone3);
 
-        String emailid = userIdentity.getEmail().substring(0,userIdentity.getEmail().indexOf('@'));
+        String emailid = ((Member) principal).getEmail().substring(0,((Member) principal).getEmail().indexOf('@'));
         model.addAttribute("emailid", emailid);
-        String emaildomain = userIdentity.getEmail().substring(userIdentity.getEmail().indexOf('@')+1);
+        String emaildomain = ((Member) principal).getEmail().substring(((Member) principal).getEmail().indexOf('@')+1);
         model.addAttribute("emaildomain",emaildomain);
         String username = memberMapper.getUsername(userid);
         model.addAttribute("username", username);
@@ -312,7 +348,6 @@ public class BasketController {
 
 
         return "th/items/purchase-one-items";
-
     }
 
     @PostMapping("/goods/addItemToOrder")

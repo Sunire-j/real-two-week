@@ -1,5 +1,10 @@
 package com.example.realtwoweek.jwt;
 
+import com.example.realtwoweek.config.auth.MemberProfile;
+import com.example.realtwoweek.config.auth.OAuthAttributes;
+import com.example.realtwoweek.domain.Member;
+import com.example.realtwoweek.dto.TokenDto;
+import com.example.realtwoweek.repository.MemberRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -8,14 +13,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,13 +34,19 @@ public class TokenProvider {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
 
     private final Key key;
+    private MemberRepository memberRepository;
 
-    public TokenProvider(@Value("${jwt.secret}") String secretKey) {
+    public TokenProvider(@Value("${jwt.secret}") String secretKey, MemberRepository memberRepository) {
+        System.out.println("TokenProvider 생성자 매개변수 secretKey : " + secretKey);
+        this.memberRepository = memberRepository;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     public TokenDto generateTokenDto(Authentication authentication) {
+
+        System.out.println(authentication);
+        System.out.println("여기바로위임");
         // 권한들 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -42,11 +54,25 @@ public class TokenProvider {
 
         long now = (new Date()).getTime();
 
+        // Provider 정보 가져오기
+        String provider = "none";
+        String email = authentication.getName();
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
+            provider = oauth2Token.getAuthorizedClientRegistrationId();
+            Map<String, Object> attributes = oauth2Token.getPrincipal().getAttributes();
+
+            // OAuthAttributes를 사용하여 이메일 추출
+            MemberProfile memberProfile = OAuthAttributes.extract(provider, attributes);
+            email = memberProfile.getEmail(); // 이메일을 추출하여 사용
+        }
+
         // Access Token 생성
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())       // payload "sub": "name"
-                .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "ROLE_USER"
+                .setSubject(email)       // payload "sub": "name"
+                .claim(AUTHORITIES_KEY, authorities)
+                .claim("provider", provider) // payload "auth": "ROLE_USER"
                 .setExpiration(accessTokenExpiresIn)        // payload "exp": 151621022 (ex)
                 .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
                 .compact();
@@ -56,6 +82,7 @@ public class TokenProvider {
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
+
 
         return TokenDto.builder()
                 .grantType(BEARER_TYPE)
@@ -69,21 +96,24 @@ public class TokenProvider {
         // 토큰 복호화
         Claims claims = parseClaims(accessToken);
 
-        if (claims.get(AUTHORITIES_KEY) == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+        // 클레임에서 유저 정보 가져오기
+        String email = claims.getSubject();
+        String provider = claims.get("provider", String.class); // provider 정보를 가져옵니다.
+
+        Member member = memberRepository.findByEmailAndProvider(email, provider)
+                .orElseThrow(() -> new UsernameNotFoundException("해당하는 유저가 없습니다."));
+
+        // 권한 설정
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if (member.isAdmin()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         }
 
-        // 클레임에서 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        return new UsernamePasswordAuthenticationToken(member, "", authorities);
     }
+
 
     public boolean validateToken(String token) {
         try {

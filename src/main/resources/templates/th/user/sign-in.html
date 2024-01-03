@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <style>
         .step {
             width: 100%;
@@ -46,11 +47,11 @@
     <form action="/LoginOk" method="post" class="login-form">
         <div>
             <label for="userid" class="form-label"> 아이디
-                <input type="text" class="form-control" id="userid" name="userid">
+                <input type="text" class="form-control" id="userid" name="email">
             </label>
         </div>
         <div><label for="userpwd" class="form-label">비밀번호<input type="password" class="form-control" id="userpwd"
-                                                                name="userpwd"></label></div>
+                                                                name="password"></label></div>
 
 
 
@@ -68,8 +69,42 @@
     </div>
 </div>
 <script>
-    function startScript(){
+    $(document).ready(function(){
+        $(".login-form").on("submit", function(e){
+            e.preventDefault(); // 기본 form 제출 방식을 취소합니다.
 
+            var email = $("#userid").val();
+            var password = $("#userpwd").val();
+
+            var jsonData = JSON.stringify({
+                "email": email,
+                "password": password
+            });
+
+            $.ajax({
+                url: "/auth/login",
+                type: "POST",
+                data: jsonData,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(res){
+                    localStorage.setItem('accessToken', res.accessToken);
+                    localStorage.setItem('refreshToken', res.refreshToken);
+                    setCookie('accessToken', res.accessToken, 1800);
+                    setCookie('refreshToken', res.refreshToken, 604800);
+                    location.href="/";
+                },
+                error: function(err){
+                    console.log("에러임");
+                }
+            });
+        });
+    });
+
+    function setCookie(name, value, seconds) {
+        var expires = new Date();
+        expires.setTime(expires.getTime() + (seconds * 1000));
+        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;`;
     }
 </script>
 
