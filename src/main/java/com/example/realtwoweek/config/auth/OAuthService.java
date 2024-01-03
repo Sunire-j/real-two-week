@@ -6,6 +6,8 @@ import com.example.realtwoweek.dto.TokenDto;
 import com.example.realtwoweek.jwt.TokenProvider;
 import com.example.realtwoweek.repository.MemberRepository;
 import com.example.realtwoweek.repository.RefreshTokenRepository;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +22,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
 import java.util.*;
 
 /*
@@ -72,7 +75,7 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 
         // Refresh Token을 DB에 저장하는 로직
         RefreshToken refreshToken = RefreshToken.builder()
-                .key(member.getEmail()) // Member의 이메일을 Key로 사용
+                .key(member.getEmail()) // OAuth2에서 얻은 사용자의 이메일을 키로 사용
                 .value(tokenDto.getRefreshToken())
                 .build();
         refreshTokenRepository.save(refreshToken);

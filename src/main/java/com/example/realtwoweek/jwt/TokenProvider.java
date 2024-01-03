@@ -116,8 +116,9 @@ public class TokenProvider {
 
 
     public boolean validateToken(String token) {
+        System.out.println(token+"validate내부 token 뽑은거");
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);//oauth2.0에서 여기가  null이 나오면서 예외발생함. 왜?
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
