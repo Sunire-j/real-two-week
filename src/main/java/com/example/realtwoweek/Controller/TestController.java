@@ -11,9 +11,9 @@ public class TestController {
         return name;
     }
 
-    private int getUserNum(String username){
-        int num = 0;
+    private int getUserAddress(String username){
+        int Address = 0;
         //
-        return num;
+        return Address;
     }
 }
