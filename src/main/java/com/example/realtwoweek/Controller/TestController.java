@@ -10,4 +10,10 @@ public class TestController {
         //로직
         return name;
     }
+
+    private int getUserNum(String username){
+        int num = 0;
+        //
+        return num;
+    }
 }
